@@ -1,4 +1,6 @@
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.io.File;
 //import java.util.List;
 
@@ -6,7 +8,9 @@ import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
+import org.opencv.core.MatOfPoint2f;
 import org.opencv.core.Rect;
+import org.opencv.core.RotatedRect;
 import org.opencv.core.Point;
 import org.opencv.core.Scalar;
 import org.opencv.imgcodecs.Imgcodecs;
@@ -86,13 +90,14 @@ class camera_process implements Runnable {
 			}
 
 			// try {
-			// 	String filename = String.format("/mnt/usb/BR%06d.jpg", ++FrameNumber);
-			// 	final File file = new File(filename);
-			// 	filename = file.toString();
-			// 	Imgcodecs.imwrite(filename, mat);
+			// String filename = String.format("/mnt/usb/BR%06d.jpg", ++FrameNumber);
+			// final File file = new File(filename);
+			// filename = file.toString();
+			// Imgcodecs.imwrite(filename, mat);
 			// } catch (Exception e) {
-			// 	System.out.println(e.toString());
+			// System.out.println(e.toString());
 			// }
+			Main.bumperCamera.setImage(mat);
 
 			// Run the GRIP image processing pipeline to find all contours each of which are
 			// a series of points (x, y).
@@ -115,10 +120,23 @@ class camera_process implements Runnable {
 			gripperCube.process(mat);
 			contoursFiltered = new ArrayList<MatOfPoint>(gripperCube.filterContoursOutput());
 
+			// fake some data if nothing from GRIP
+			if (contoursFiltered.isEmpty()) {
+				Point[] oneContour = new Point[40];
+
+				for (int i = 0; i < oneContour.length; i++) {
+					oneContour[i] = new Point();
+					oneContour[i].x = i < 20 ? (double) (4 * i) + 10. : 110. - (double) (4 * i);
+					oneContour[i].y = i < 20 ? (double) (4 * i) + 20. : 90. - (double) (4 * i);
+				}
+				MatOfPoint myContour = new MatOfPoint(oneContour);
+				contoursFiltered.add(myContour);
+			}
+
 			if (contoursFiltered.isEmpty()) { // no contours in this frame
 												// debug output
 												// System.out.println("No GRIP Contours");
-				Imgproc.putText(mat, "No Contours", new Point(50, 22), Core.FONT_HERSHEY_SIMPLEX, 1.,
+				Imgproc.putText(mat, "No Contours", new Point(50, 22), Core.FONT_HERSHEY_SIMPLEX, 0.4,
 						new Scalar(255, 255, 255), 2);
 				targetInfo.set(-1., -1., 0., 0.);
 			} else { // process the contours
@@ -168,6 +186,18 @@ class camera_process implements Runnable {
 					// debug output
 					// System.out.printf("\n[Vision] (x, y) (%d, %d) (w, h) (%d, %d) (cog x, y) (%d,
 					// %d)\n", br.x, br.y, br.width, br.height, cogX, cogY);
+
+					/* angle Rectangle */
+					MatOfPoint2f dst = new MatOfPoint2f();
+					aContour.convertTo(dst, CvType.CV_32F);
+					RotatedRect betterRect = new RotatedRect();
+					betterRect = Imgproc.minAreaRect(dst);
+
+					Point points[] = new Point[4];
+					betterRect.points(points);
+					for (int i = 0; i < 4; ++i) {
+						Imgproc.line(mat, points[i], points[(i + 1) % 4], new Scalar(255, 255, 0), 5);
+					}
 				}
 
 				targetInfo.set(bestX, bestY, bestWidth, bestArea);
@@ -176,25 +206,28 @@ class camera_process implements Runnable {
 
 			// wrap up this camera frame
 
-			//System.out.println("Bumper " + targetInfo.toJson());
+			// System.out.println("Bumper " + targetInfo.toJson());
 			// Bumper {"COGX":-1.0,"COGY":-1.0,"Width":0.0,"Area":0.0,"Fresh":true}
 			// Elevator {"COGX":82.0,"COGY":60.0,"Width":147.0,"Area":17640.0,"Fresh":true}
+
+			Main.bumperPipeline.setImage(mat);
 
 			// Give the output stream a new image to display
 			outputStream.putFrame(mat);
 
-			// try {
-			// 	String filename = String.format("/mnt/usb/B%06d.jpg", FrameNumber);
-			// 	final File file = new File(filename);
-			// 	filename = file.toString();
-			// 	Imgcodecs.imwrite(filename, mat);
-			// } catch (Exception e) {
-			// 	System.out.println(e.toString());
-			// }
+			try {
+			String filename = String.format("/mnt/usb/B%06d.jpg", FrameNumber);
+			final File file = new File(filename);
+			filename = file.toString();
+			Imgcodecs.imwrite(filename, mat);
+			} catch (Exception e) {
+			System.out.println(e.toString());
+			}
 
 			// print statistics about this frame
-			//System.out.println("[Vision] End Camera Frame Loop Elapsed time = " + (time.get()-startTime));
-			System.out.println("Bumper " + 1./(time.get()-startTime) + " fps");
+			// System.out.println("[Vision] End Camera Frame Loop Elapsed time = " +
+			// (time.get()-startTime));
+			System.out.println("Bumper " + 1. / (time.get() - startTime) + " fps");
 			// System.out.println("Free memory " + Runtime.getRuntime().freeMemory() + "
 			// Total memory " + Runtime.getRuntime().totalMemory() + " Max memory " +
 			// Runtime.getRuntime().maxMemory());

@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.io.File;
 //import java.util.List;
 
@@ -84,13 +85,15 @@ class camera_processB implements Runnable {
 			}
 
 			// try {
-			// 	String filename = String.format("/mnt/usb/ER%06d.jpg", ++FrameNumber);
-			// 	final File file = new File(filename);
-			// 	filename = file.toString();
-			// 	Imgcodecs.imwrite(filename, mat);
+			// String filename = String.format("/mnt/usb/ER%06d.jpg", ++FrameNumber);
+			// final File file = new File(filename);
+			// filename = file.toString();
+			// Imgcodecs.imwrite(filename, mat);
 			// } catch (Exception e) {
-			// 	System.out.println(e.toString());
+			// System.out.println(e.toString());
 			// }
+
+			Main.elevatorCamera.setImage(mat);
 
 			// Run the GRIP image processing pipeline to find all contours each of which are
 			// a series of points (x, y).
@@ -116,7 +119,7 @@ class camera_processB implements Runnable {
 			if (contoursFiltered.isEmpty()) { // no contours in this frame
 												// debug output
 												// System.out.println("No GRIP Contours");
-				Imgproc.putText(mat, "No Contours", new Point(50, 22), Core.FONT_HERSHEY_SIMPLEX, 1.,
+				Imgproc.putText(mat, "No Contours", new Point(50, 22), Core.FONT_HERSHEY_SIMPLEX, 0.4,
 						new Scalar(255, 255, 255), 2);
 				targetInfoB.set(-1., -1., 0., 0.);
 			} else { // process the contours
@@ -174,26 +177,29 @@ class camera_processB implements Runnable {
 
 			// wrap up this camera frame
 
-			//System.out.println("Elevator " + targetInfoB.toJson());
+			// System.out.println("Elevator " + targetInfoB.toJson());
 			// Bumper {"COGX":-1.0,"COGY":-1.0,"Width":0.0,"Area":0.0,"Fresh":true}
 			// Elevator {"COGX":82.0,"COGY":60.0,"Width":147.0,"Area":17640.0,"Fresh":true}
+
+			Main.elevatorPipeline.setImage(mat);
 
 			// Give the output stream a new image to display
 			outputStream.putFrame(mat);
 
-			// try {
-			// 	String filename = String.format("/mnt/usb/E%06d.jpg", FrameNumber);
-			// 	final File file = new File(filename);
-			// 	filename = file.toString();
-			// 	Imgcodecs.imwrite(filename, mat);
-			// } catch (Exception e) {
-			// 	System.out.println(e.toString());
-			// }
+			try {
+			String filename = String.format("/mnt/usb/E%06d.jpg", FrameNumber);
+			final File file = new File(filename);
+			filename = file.toString();
+			Imgcodecs.imwrite(filename, mat);
+			} catch (Exception e) {
+			System.out.println(e.toString());
+			}
 
 			// print statistics about this frame
-			//System.out.println("[Vision] End Camera Frame Loop Elapsed time = " + (time.get()-startTime));
-			System.out.println("Elevator " + 1./(time.get()-startTime) + " fps");
-		  // System.out.println("Free memory " + Runtime.getRuntime().freeMemory() + "
+			// System.out.println("[Vision] End Camera Frame Loop Elapsed time = " +
+			// (time.get()-startTime));
+			System.out.println("Elevator " + 1. / (time.get() - startTime) + " fps");
+			// System.out.println("Free memory " + Runtime.getRuntime().freeMemory() + "
 			// Total memory " + Runtime.getRuntime().totalMemory() + " Max memory " +
 			// Runtime.getRuntime().maxMemory());
 

@@ -59,7 +59,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
    }
  */
 
-public final class Main {
+public class Main {
   private static String configFile = "/boot/frc.json";
 
   @SuppressWarnings("MemberName")
@@ -72,8 +72,17 @@ public final class Main {
 
   public static Thread visionThread;
   public static Thread visionThreadB;
+  public static Thread imageMergeThread;
+
   public static camera_process cp;
   public static camera_processB cpB;
+  public static imageMerge imageDriver;
+
+  static images bumperCamera = new images();
+  static images bumperPipeline = new images();
+  static images elevatorCamera = new images();
+  static images elevatorPipeline = new images();
+
 
   public static int team;
   public static boolean server;
@@ -241,6 +250,11 @@ public final class Main {
       } else
         System.out.println("Unknown camera in cameraConfigs");
     }
+
+    // start processedmiamges merge and serve thread
+    imageDriver = new imageMerge();
+    imageMergeThread = new Thread(imageDriver);
+    imageMergeThread.start();
 
     // visionThread.setDaemon(true); // defines a sort of "background" task that
     // just keeps running (until all the normal threads have terminated; must set

@@ -1,13 +1,15 @@
 import com.google.gson.Gson;
 
-public class TargetInfoB {
+public class TargetInfoB
+{
 	private double COGX;
 	private double COGY;
 	private double Width;
 	private double Area;
 	private boolean Fresh;
 
-	public TargetInfoB() {
+	public TargetInfoB()
+	{
 		COGX = -1.;
 		COGY = -1.;
 		Width = 0;
@@ -15,7 +17,8 @@ public class TargetInfoB {
 		Fresh = true;
 	}
 
-	public synchronized void set(double aCOGX, double aCOGY, double aWidth, double aArea) {
+	public synchronized void set(double aCOGX, double aCOGY, double aWidth, double aArea)
+	{
 		COGX = aCOGX;
 		COGY = aCOGY;
 		Width = aWidth;
@@ -23,7 +26,8 @@ public class TargetInfoB {
 		Fresh = true;
 	}
 
-	public synchronized void get(TargetInfoB aTargetInfo) {
+	public synchronized void get(TargetInfoB aTargetInfo)
+	{
 		aTargetInfo.COGX = COGX;
 		aTargetInfo.COGY = COGY;
 		aTargetInfo.Width = Width;
@@ -32,16 +36,19 @@ public class TargetInfoB {
 		Fresh = false;
 	}
 
-	public synchronized boolean isFresh() {
+	public synchronized boolean isFresh()
+	{
 		return Fresh;
 	}
 
-	public synchronized String toString() {
+	public synchronized String toString()
+	{
 		return String.format("[TargetInfoB] COG x = %f, COG y = %f, Width = %f, Area = %f  %s]", COGX, COGY, Width,
 				Area, Fresh ? "FRESH" : "stale");
 	}
 
-	public synchronized String toJson() {
+	public synchronized String toJson()
+	{
 		Gson gson = new Gson(); // Or use new GsonBuilder().create();
 		String json = gson.toJson(this); // serializes target to Json
 		return json;
