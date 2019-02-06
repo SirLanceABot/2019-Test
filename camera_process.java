@@ -80,6 +80,8 @@ class camera_process implements Runnable {
 			// System.out.println("\n[Vision] Starting camera frame grab at Time = " +
 			// startTime);
 
+			FrameNumber++;
+
 			// Tell the CvSink to grab a frame from the camera and put it
 			// in the source mat. If there is an error notify the output.
 			if (cvSink.grabFrame(mat) == 0) {
@@ -89,14 +91,16 @@ class camera_process implements Runnable {
 				continue;
 			}
 
-			// try {
-			// String filename = String.format("/mnt/usb/BR%06d.jpg", ++FrameNumber);
-			// final File file = new File(filename);
-			// filename = file.toString();
-			// Imgcodecs.imwrite(filename, mat);
-			// } catch (Exception e) {
-			// System.out.println(e.toString());
-			// }
+			if (Main.logImage)
+				try {
+					String filename = String.format("/mnt/usb/BR%06d.jpg", FrameNumber);
+					final File file = new File(filename);
+					filename = file.toString();
+					Imgcodecs.imwrite(filename, mat);
+				} catch (Exception e) {
+					System.out.println(e.toString());
+				}
+
 			Main.bumperCamera.setImage(mat);
 
 			// Run the GRIP image processing pipeline to find all contours each of which are
@@ -206,6 +210,8 @@ class camera_process implements Runnable {
 
 			// wrap up this camera frame
 
+			Main.sendMessage.Communicate("Bumper " + targetInfo.toJson()); // UDP to a receiver who wants this data
+
 			// System.out.println("Bumper " + targetInfo.toJson());
 			// Bumper {"COGX":-1.0,"COGY":-1.0,"Width":0.0,"Area":0.0,"Fresh":true}
 			// Elevator {"COGX":82.0,"COGY":60.0,"Width":147.0,"Area":17640.0,"Fresh":true}
@@ -215,14 +221,15 @@ class camera_process implements Runnable {
 			// Give the output stream a new image to display
 			outputStream.putFrame(mat);
 
-			try {
-			String filename = String.format("/mnt/usb/B%06d.jpg", FrameNumber);
-			final File file = new File(filename);
-			filename = file.toString();
-			Imgcodecs.imwrite(filename, mat);
-			} catch (Exception e) {
-			System.out.println(e.toString());
-			}
+			if (Main.logImage)
+				try {
+					String filename = String.format("/mnt/usb/B%06d.jpg", FrameNumber);
+					final File file = new File(filename);
+					filename = file.toString();
+					Imgcodecs.imwrite(filename, mat);
+				} catch (Exception e) {
+					System.out.println("error saving image file " + e.toString());
+				}
 
 			// print statistics about this frame
 			// System.out.println("[Vision] End Camera Frame Loop Elapsed time = " +

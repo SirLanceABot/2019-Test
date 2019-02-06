@@ -1,4 +1,16 @@
 
+/*
+RaspBerry Pi setup:
+
+Format an SD card [SD Card Formatter]
+Download frcvision image
+Load image () [ B? Etcher]
+Add auto mount of image log USB flash drive to /etc/fstab
+make image log directory mount point [mkdir /mnt/usb]
+add a file to indicate boot system or the mointed system [touch /mnt/usb/NoFlashDriveExists]
+configure cameras [browser frcvision.local/]
+
+
 /*----------------------------------------------------------------------------*/
 /* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
@@ -7,6 +19,7 @@
 /*----------------------------------------------------------------------------*/
 
 import java.io.IOException;
+import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -70,19 +83,26 @@ public class Main {
     public JsonElement streamConfig;
   }
 
+  public static camera_process cp;
+  public static camera_processB cpB;
+  public static imageMerge imageDriver;
+
   public static Thread visionThread;
   public static Thread visionThreadB;
   public static Thread imageMergeThread;
 
-  public static camera_process cp;
-  public static camera_processB cpB;
-  public static imageMerge imageDriver;
+  public static UDPsend sendMessage = new UDPsend(5800); // allmessages go to one UDP sender defined for one port but could have two senders on
+                                           // different ports if that makes it easier to separate the messages
+
+  public static UDPreceive testUDPreceive;
+  public static Thread UDPreceiveThread;
 
   static images bumperCamera = new images();
   static images bumperPipeline = new images();
   static images elevatorCamera = new images();
   static images elevatorPipeline = new images();
 
+  static boolean logImage = false;
 
   public static int team;
   public static boolean server;
@@ -223,6 +243,12 @@ public class Main {
       return;
     }
 
+    // start test UDP receive since we don't have a roboRIO to test with - this
+    // would go on the roboRIO not here on the RPi
+    testUDPreceive = new UDPreceive(5800);
+    UDPreceiveThread = new Thread(testUDPreceive);
+    UDPreceiveThread.start();
+
     // start NetworkTables
     NetworkTableInstance ntinst = NetworkTableInstance.getDefault();
     if (server) {
@@ -251,6 +277,18 @@ public class Main {
         System.out.println("Unknown camera in cameraConfigs");
     }
 
+    // see if USB Flash Drive mounted and if so log the images
+    {
+      final File NoFlashDriveMounted = new File("/mnt/usb/NoFlashDriveExists");
+      if (NoFlashDriveMounted.exists()) {
+        logImage = false;
+        System.out.println("No Flash Drive Mounted");
+      } else {
+        logImage = true;
+        System.out.println("Flash Drive Mounted and image logging is on");
+      }
+    }
+
     // start processedmiamges merge and serve thread
     imageDriver = new imageMerge();
     imageMergeThread = new Thread(imageDriver);
@@ -261,7 +299,9 @@ public class Main {
     // before the ".start"
 
     // loop forever
-    for (;;) {
+    for (;;)
+
+    {
       try {
         // System.out.println("Parent sleeping 10 seconds");
         Thread.sleep(10000);
