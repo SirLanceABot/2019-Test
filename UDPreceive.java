@@ -9,6 +9,8 @@ import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.lang.Integer;
 
+import com.google.gson.Gson;
+
 public class UDPreceive extends Thread {
     // int port = 5800; // listen on my port number
 
@@ -59,6 +61,28 @@ public class UDPreceive extends Thread {
                 byte[] data = packet.getData();
                 lastDataReceived = new String(data, 0, packet.getLength());
                 System.out.println("UDP received >" + lastDataReceived + "<");
+                
+                if (lastDataReceived.startsWith("Bumper "))
+                {
+                    String message = new String(lastDataReceived.substring("Bumper ".length()));
+                    TargetInfo receivedTarget = new TargetInfo();
+                    receivedTarget.fromJson(message);
+                    System.out.println("Received bumper " + receivedTarget);
+                }
+
+                else
+                if (lastDataReceived.startsWith("Elevator "))
+                {
+                    String message = new String(lastDataReceived.substring("Elevator ".length()));
+                    TargetInfoB receivedTargetB = new TargetInfoB();
+                    receivedTargetB.fromJson(message);
+                    System.out.println("Received elevator " + receivedTargetB);
+                }
+
+                else
+                {
+                    System.out.println("Unknown class received UDP " + lastDataReceived);
+                }
             } catch (SocketTimeoutException e) {
                 // do something when no messages for awhile
                 System.out.println("haven't heard from the vision pipeline for awhile");

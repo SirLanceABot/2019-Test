@@ -25,6 +25,11 @@ public class TargetInfoB
 		Area = aArea;
 		Fresh = true;
 	}
+	
+	public synchronized void fromJson(String message) {
+		TargetInfoB temp = new Gson().fromJson(message, TargetInfoB.class);
+		set(temp.COGX, temp.COGY, temp.Width, temp.Area);
+	}
 
 	public synchronized void get(TargetInfoB aTargetInfo)
 	{
