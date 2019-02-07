@@ -7,7 +7,7 @@ Download frcvision image
 Load image () [ B? Etcher]
 Add auto mount of image log USB flash drive to /etc/fstab
 make image log directory mount point [mkdir /mnt/usb]
-add a file to indicate boot system or the mointed system [touch /mnt/usb/NoFlashDriveExists]
+add a file to indicate boot system or the mointed system [touch /mnt/usb/NoFlashDriveMounted]
 configure cameras [browser frcvision.local/]
 
 
@@ -279,7 +279,7 @@ public class Main {
 
     // see if USB Flash Drive mounted and if so log the images
     {
-      final File NoFlashDriveMounted = new File("/mnt/usb/NoFlashDriveExists");
+      final File NoFlashDriveMounted = new File("/mnt/usb/NoFlashDriveMounted");
       if (NoFlashDriveMounted.exists()) {
         logImage = false;
         System.out.println("No Flash Drive Mounted");
