@@ -3,30 +3,17 @@
 import java.io.*;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
-import java.lang.Integer;
-
-import com.google.gson.Gson;
 
 public class UDPreceive extends Thread {
-    // int port = 5800; // listen on my port number
-
+ 
     public static String lastDataReceived = "";
     protected DatagramSocket socket = null;
     protected BufferedReader in = null;
     protected boolean moreQuotes = true;
 
-    // public UDPReceiver() throws IOException {
-    // this("udpReceiver");
-    // }
-    //
-    // public UDPReceiver(String name) throws IOException {
-    // super(name);
-    // socket = new DatagramSocket(port);
-    // }
-    public UDPreceive(int port) {
+     public UDPreceive(int port) {
         // super(name);
         try {
             socket = new DatagramSocket(port);

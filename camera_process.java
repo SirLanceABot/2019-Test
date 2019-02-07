@@ -1,8 +1,5 @@
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.io.File;
-//import java.util.List;
 
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
@@ -18,10 +15,10 @@ import org.opencv.imgproc.Imgproc;
 
 import edu.wpi.cscore.CvSink;
 import edu.wpi.cscore.CvSource;
-
 import edu.wpi.cscore.MjpegServer;
 import edu.wpi.cscore.VideoMode;
 import edu.wpi.cscore.VideoSource;
+
 import edu.wpi.first.wpilibj.Timer;
 
 class camera_process implements Runnable {
@@ -42,8 +39,6 @@ class camera_process implements Runnable {
 	}
 
 	private void visionPipeline() {
-		// System.runFinalization();
-		// System.gc();
 
 		GripPipelineCube gripperCube = new GripPipelineCube();
 
@@ -58,7 +53,7 @@ class camera_process implements Runnable {
 		// CvSource outputStream = CameraServer.getInstance().putVideo("RectangleB",
 		// 320, 240);
 
-		CvSource outputStream = new CvSource("Bumper", VideoMode.PixelFormat.kMJPEG, 160, 120, 30);
+		CvSource outputStream = new CvSource("Bumper", VideoMode.PixelFormat.kMJPEG, 320, 240, 30);
 		// CvSource cvsource = new CvSource("cvsource", VideoMode.PixelFormat.kMJPEG,
 		// width, height, frames_per_sec);
 
@@ -69,7 +64,6 @@ class camera_process implements Runnable {
 		// all Java Mats have to be "pre-allocated" - they can't be in the loop because
 		// they are never released and will cause out of memory
 		Mat mat = new Mat();
-		Mat zeros = Mat.zeros(60, 160, CvType.CV_8UC3);
 		Timer time = new Timer();
 		time.start();
 		int FrameNumber = 0;
@@ -91,6 +85,15 @@ class camera_process implements Runnable {
 				continue;
 			}
 
+			/*
+			a couple of examples of a quick and dirty rectangular mask
+			copy something into the image (zeros or ones) or draw a rectangle
+			maybe making a zeros once is more efficient then use the variable zeros
+			Mat zeros = Mat.zeros(60, 160, CvType.CV_8UC3);
+			Mat.zeros(120, 320, CvType.CV_8UC3).copyTo(mat.submat(0, 120, 0, 320));
+			Imgproc.rectangle(mat, new Point(0,0), new Point(320,120), new Scalar(0, 0, 0), -1);
+			*/
+
 			if (Main.logImage)
 				try {
 					String filename = String.format("/mnt/usb/BR/%06d.jpg", FrameNumber);
@@ -103,28 +106,12 @@ class camera_process implements Runnable {
 
 			Main.bumperCamera.setImage(mat);
 
-			// Run the GRIP image processing pipeline to find all contours each of which are
-			// a series of points (x, y).
-			// The assumption is each contour represents the point of a light on a string of
-			// lights.
-			// Each contour will then be reduced to a bounding upright rectangle with a
-			// center of gravity (x, y) - the light.
-			// The set of all centers of gravity are used in the RANSAC to cluster the
-			// points in straight lines - the string of lights.
-
 			ArrayList<MatOfPoint> contoursFiltered;
-
-			// System.out.println("[Vision] CUBE ");
-
-			// zeros.copyTo(mat.submat(0, 120, 0, 320)); // zero top half of image
-
-			// Imgproc.rectangle(mat, new Point(0,0), new Point(320,120), new Scalar(0, 0,
-			// 0), -1); //alternate way to make a mask
 
 			gripperCube.process(mat);
 			contoursFiltered = new ArrayList<MatOfPoint>(gripperCube.filterContoursOutput());
 
-			// fake some data if nothing from GRIP
+			// fake some data if nothing from GRIP - just testing
 			if (contoursFiltered.isEmpty()) {
 				Point[] oneContour = new Point[40];
 
@@ -138,14 +125,12 @@ class camera_process implements Runnable {
 			}
 
 			if (contoursFiltered.isEmpty()) { // no contours in this frame
-												// debug output
-												// System.out.println("No GRIP Contours");
+				// System.out.println("No GRIP Contours");
 				Imgproc.putText(mat, "No Contours", new Point(50, 22), Core.FONT_HERSHEY_SIMPLEX, 0.4,
 						new Scalar(255, 255, 255), 2);
 				targetInfo.set(-1., -1., 0., 0.);
 			} else { // process the contours
-						// debug output
-						// System.out.println(contoursFiltered.size() + " contours");
+				// System.out.println(contoursFiltered.size() + " contours");
 
 				// draw all contours at once (negative index); could draw one at a time within
 				// the contour loop but this has to be more efficient
@@ -161,7 +146,6 @@ class camera_process implements Runnable {
 
 				for (MatOfPoint aContour : contoursFiltered) // iterate one contour at a time through all the contours
 				{
-					// debug output
 					// System.out.print("[Vision] " + aContour.size() + " points in
 					// contour\n[Vision]"); // a contour is a bunch of points
 					// convert MatofPoint to an array of those Points and iterate (could do list of
@@ -216,6 +200,7 @@ class camera_process implements Runnable {
 			// Bumper {"COGX":-1.0,"COGY":-1.0,"Width":0.0,"Area":0.0,"Fresh":true}
 			// Elevator {"COGX":82.0,"COGY":60.0,"Width":147.0,"Area":17640.0,"Fresh":true}
 
+			// save image for the merge process
 			Main.bumperPipeline.setImage(mat);
 
 			// Give the output stream a new image to display
@@ -235,76 +220,14 @@ class camera_process implements Runnable {
 			// System.out.println("[Vision] End Camera Frame Loop Elapsed time = " +
 			// (time.get()-startTime));
 			System.out.println("Bumper " + 1. / (time.get() - startTime) + " fps");
-			// System.out.println("Free memory " + Runtime.getRuntime().freeMemory() + "
-			// Total memory " + Runtime.getRuntime().totalMemory() + " Max memory " +
-			// Runtime.getRuntime().maxMemory());
-
 		} // end of this camera frame
 
 		// Interrupted thread so end the camera frame grab with one last targetInfo of
 		// no data
 		targetInfo.set(-1., -1., 0., 0.);
 		mat.release();
-		zeros.release();
 		System.out.println("[Vision] Camera Frame Grab Interrupted and Ended Thread");
 
 	} // end of visionPipeline method
 
 } // end of class camera_process
-
-//// 320 width = 320 cols; 240 height = 240 rows
-//// Mat rows, cols =240 320
-//// bottom half start row 120 end row 240 start col 0 end col 320
-//// Mat maskOffTop = new Mat(240, 320, CvType.CV_8UC1, new Scalar(0));
-//// Mat.ones(120, 320, CvType.CV_8UC1).copyTo(maskOffTop.submat(120, 240, 0,
-//// 320));
-// Mat maskOffTop = new Mat(24, 32, CvType.CV_8UC1, new Scalar(0));
-// Mat.ones(12, 32, CvType.CV_8UC1).copyTo(maskOffTop.submat(12, 24, 0, 32));
-// byte[] aRow = new byte[32];
-//
-// for(int row = 0;row <24; row++)
-// {
-// maskOffTop.get(row, 0, aRow);
-// for (int col = 0; col < 32; col++)
-// {
-// System.out.print(aRow[col] + " ");
-// }
-// System.out.println();
-// }
-/// *
-// */
-//
-//// maskOffTop.dump(); dump does nothing
-//// System.out.println(maskOffTop);
-// Mat.zeros(120, 320, CvType.CV_8UC3).copyTo(mat.submat(0, 120, 0, 320));
-
-// {
-// byte[] aRow = new byte[320*3];
-//
-// for(int row = 0;row <1/*240*/; row++)
-// {
-// mat.get(row, 0, aRow);
-// for (int col = 0; col < 320*3; col++)
-// {
-// System.out.print(aRow[col] + " ");
-// }
-// System.out.println();
-// }
-// }
-//
-// Imgproc.rectangle(mat, new Point(0,0), new Point(320,120), new Scalar(0, 0,
-// 0), -1);
-//
-// {
-// byte[] aRow = new byte[320*3];
-//
-// for(int row = 0;row <1/*240*/; row++)
-// {
-// mat.get(row, 0, aRow);
-// for (int col = 0; col < 320*3; col++)
-// {
-// System.out.print(aRow[col] + " ");
-// }
-// System.out.println();
-// }
-// }

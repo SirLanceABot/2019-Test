@@ -4,12 +4,13 @@ RaspBerry Pi setup:
 
 Format an SD card [SD Card Formatter]
 Download frcvision image
-Load image () [ B? Etcher]
-Add auto mount of image log USB flash drive to /etc/fstab
-make image log directory mount point [mkdir /mnt/usb]
-add a file to indicate boot system or the mointed system [touch /mnt/usb/NoFlashDriveMounted]
-configure cameras [browser frcvision.local/]
-
+Load image on SD card with balena Etcher [or others]
+Add auto mount of our camera image log USB flash drive to /etc/fstab
+Make camera image log directory mount point [mkdir /mnt/usb]
+Add a file to indicate boot system or the mounted flash drive system [touch /mnt/usb/NoFlashDriveMounted]
+On the flash drive(s) make the directories for the camera images
+   [mkdir /mnt/usb/B; mkdir /mnt/usb/BR; mkdir /mnt/usb/E; mkdir /mnt/usb/ER]
+Configure cameras [browser frcvision.local/]
 
 /*----------------------------------------------------------------------------*/
 /* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
@@ -91,8 +92,10 @@ public class Main {
   public static Thread visionThreadB;
   public static Thread imageMergeThread;
 
-  public static UDPsend sendMessage = new UDPsend(5800); // allmessages go to one UDP sender defined for one port but could have two senders on
-                                           // different ports if that makes it easier to separate the messages
+  // TODO:
+  // all messages go to one UDP sender defined for one port but could have two
+  // senders on different ports if that makes it easier to separate the messages
+  public static UDPsend sendMessage = new UDPsend(5800);
 
   public static UDPreceive testUDPreceive; // test UDP receiver in place of a roboRIO
   public static Thread UDPreceiveThread;   // remove these or at least don't start this thread if using the roboRIO
@@ -243,7 +246,7 @@ public class Main {
       return;
     }
 
-    // start test UDP receive since we don't have a roboRIO to test with - this
+    // start test UDP receiver since we don't have a roboRIO to test with - this
     // would go on the roboRIO not here on the RPi
     testUDPreceive = new UDPreceive(5800);
     UDPreceiveThread = new Thread(testUDPreceive);
@@ -277,7 +280,7 @@ public class Main {
         System.out.println("Unknown camera in cameraConfigs");
     }
 
-    // see if USB Flash Drive mounted and if so log the images
+    // see if USB Flash Drive mounted and if so, log the images
     {
       final File NoFlashDriveMounted = new File("/mnt/usb/NoFlashDriveMounted");
       if (NoFlashDriveMounted.exists()) {
