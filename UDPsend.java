@@ -24,6 +24,7 @@ public class UDPsend {
     public UDPsend(int port) {
 
         try {
+            // TODO: add code to variably specify where to send messages
             // InetAddress address = InetAddress.getByAddress(IP);
             address = InetAddress.getByName("127.0.0.1"); // http://roborio-4237-frc.local/#Home
         } catch (UnknownHostException e) {

@@ -93,10 +93,10 @@ class camera_process implements Runnable {
 
 			if (Main.logImage)
 				try {
-					String filename = String.format("/mnt/usb/BR%06d.jpg", FrameNumber);
+					String filename = String.format("/mnt/usb/BR/%06d.jpg", FrameNumber);
 					final File file = new File(filename);
 					filename = file.toString();
-					Imgcodecs.imwrite(filename, mat);
+					if(!Imgcodecs.imwrite(filename, mat)) System.out.println("Error writing BR");
 				} catch (Exception e) {
 					System.out.println(e.toString());
 				}
@@ -223,10 +223,10 @@ class camera_process implements Runnable {
 
 			if (Main.logImage)
 				try {
-					String filename = String.format("/mnt/usb/B%06d.jpg", FrameNumber);
+					String filename = String.format("/mnt/usb/B/%06d.jpg", FrameNumber);
 					final File file = new File(filename);
 					filename = file.toString();
-					Imgcodecs.imwrite(filename, mat);
+					if(!Imgcodecs.imwrite(filename, mat)) System.out.println("Error writing B");
 				} catch (Exception e) {
 					System.out.println("error saving image file " + e.toString());
 				}

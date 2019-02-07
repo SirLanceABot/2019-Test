@@ -1,5 +1,4 @@
-
-// UDP receive program
+// UDP receive program - test receiver instead of using the roboRIO
 
 import java.io.*;
 import java.net.DatagramPacket;
@@ -60,7 +59,7 @@ public class UDPreceive extends Thread {
                 socket.receive(packet); // always receive the packets
                 byte[] data = packet.getData();
                 lastDataReceived = new String(data, 0, packet.getLength());
-                System.out.println("UDP received >" + lastDataReceived + "<");
+                //System.out.println("UDP received >" + lastDataReceived + "<");
                 
                 if (lastDataReceived.startsWith("Bumper "))
                 {

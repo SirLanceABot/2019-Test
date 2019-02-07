@@ -94,8 +94,8 @@ public class Main {
   public static UDPsend sendMessage = new UDPsend(5800); // allmessages go to one UDP sender defined for one port but could have two senders on
                                            // different ports if that makes it easier to separate the messages
 
-  public static UDPreceive testUDPreceive;
-  public static Thread UDPreceiveThread;
+  public static UDPreceive testUDPreceive; // test UDP receiver in place of a roboRIO
+  public static Thread UDPreceiveThread;   // remove these or at least don't start this thread if using the roboRIO
 
   static images bumperCamera = new images();
   static images bumperPipeline = new images();
