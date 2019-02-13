@@ -39,8 +39,8 @@ public class UDPsend {
             // Example: socket = new DatagramSocket(port);
             // Example: socket.setReuseAddress(true);
 
-            datagramSocket.setSoTimeout(2000); // robot response receive timeout in milliseconds check in case robot
-                                               // isn't responding
+            // datagramSocket.setSoTimeout(2000); // robot response receive timeout in milliseconds check in case robot
+                                                  // isn't responding.  Not used if no attempt to receive a response
         } catch (SocketException e) {
             e.printStackTrace();
         }
