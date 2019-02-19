@@ -297,7 +297,7 @@ public class Main
         // start test UDP receiver since we don't have a roboRIO to test with - this
         // would go on the roboRIO not here on the RPi
         testUDPreceive = new UdpReceive(5800);
-        UDPreceiveThread = new Thread(testUDPreceive);
+        UDPreceiveThread = new Thread(testUDPreceive, "4237UDPreceive");
         UDPreceiveThread.start();
 
         // start NetworkTables
@@ -380,7 +380,6 @@ public class Main
                 System.out.println("[main] Starting Bumper camera port 1181");
                 cp = new CameraProcess(startCamera(cameraConfig, 1181));
                 visionThread = new Thread(cp, "4237BumperCamera");
-                visionThread.setName("4237BumperCamera");
                 visionThread.start(); // start thread using the class' run() method (just saying run() won't start a
                                       // thread - that just runs run() once)
             }
@@ -389,8 +388,7 @@ public class Main
                 System.out.println("[main] Starting Elevator camera on port 1182");
                 cpB = new CameraProcessB(startCamera(cameraConfig, 1182));
                 visionThreadB = new Thread(cpB, "4237ElevatorCamera");
-                //visionThreadB.setName("4237ElevatorCamera");
-                visionThreadB.start();
+                 visionThreadB.start();
             }
             else
                 System.out.println("[main] Unknown camera in cameraConfigs");
@@ -408,7 +406,6 @@ public class Main
 
         imageDriver = new ImageMerge();
         imageMergeThread = new Thread(imageDriver, "4237ImageMerge");
-        //imageMergeThread.setName("4237ImageMerge");
         imageMergeThread.start();
 
         // visionThread.setDaemon(true); // defines a sort of "background" task that

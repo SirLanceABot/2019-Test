@@ -15,7 +15,7 @@ import java.net.SocketTimeoutException;
 
 import com.google.gson.Gson;
 
-public class UdpReceive extends Thread
+public class UdpReceive implements Runnable
 {
 
     class TargetData
