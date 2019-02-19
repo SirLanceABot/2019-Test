@@ -19,12 +19,18 @@ Configure cameras [browser frcvision.local/]
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+
 import java.io.IOException;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+//import java.util.*;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -37,6 +43,7 @@ import edu.wpi.cscore.MjpegServer;
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.cscore.VideoSource;
 import edu.wpi.first.networktables.NetworkTableInstance;
+
 
 /*
    JSON format:
@@ -74,7 +81,22 @@ import edu.wpi.first.networktables.NetworkTableInstance;
  */
 
 public class Main
-{
+{ 
+    private static String output(InputStream inputStream) throws IOException {
+        StringBuilder sb = new StringBuilder();
+        BufferedReader br = null;
+        try {
+            br = new BufferedReader(new InputStreamReader(inputStream));
+            String line = null;
+            while ((line = br.readLine()) != null) {
+                sb.append(line + System.getProperty("line.separator"));
+            }
+        } finally {
+            br.close();
+        }
+        return sb.toString();
+    }
+
     private static String configFile = "/boot/frc.json";
 
     @SuppressWarnings("MemberName")
@@ -112,10 +134,6 @@ public class Main
     public static int team;
     public static boolean server;
     public static List<CameraConfig> cameraConfigs = new ArrayList<>();
-
-    private Main()
-    {
-    }
 
     /**
      * Report parse error.
@@ -291,6 +309,41 @@ public class Main
             ntinst.startClientTeam(team);
         }
 
+// see if USB Flash Drive mounted and if so, log the images
+       try
+       {
+           System.out.println("Parent sleeping 3 seconds so auto mount will be done");
+           Thread.sleep(3000);
+       } catch (InterruptedException exc)
+       {
+           System.out.println("Sleep 3 seconds was interrupted");
+       }
+
+try
+{
+   List<String> command = new ArrayList<String>(); // build my command as a list of strings
+   command.add("bash");
+   command.add("-c");
+   command.add("mountpoint -q /mnt/usb ; echo $?");
+
+// execute my command
+   System.out.println("Run mountpoint /mnt/usb command");
+   ProcessBuilder pb = new ProcessBuilder(command);
+   Process process = pb.start();
+   int errCode = process.waitFor();
+   System.out.println("mount command executed, any errors? " + (errCode == 0 ? "No" : "Yes"));
+   String mountOutput = output(process.getInputStream());
+   System.out.println("mount output:\n" + mountOutput);    
+   System.out.println("mount errors:\n" + output(process.getErrorStream()));
+   logImage = mountOutput.startsWith("0");
+   System.out.println(logImage?"Flash Drive Mounted /mnt/usb and image logging is on":"No Flash Drive Mounted");
+ } catch (Exception ex2)
+{
+  System.out.println("Error fetching mount information " + ex2);
+}
+
+System.out.flush();
+
         // start cameras
         for (CameraConfig cameraConfig : cameraConfigs)
         {
@@ -312,21 +365,6 @@ public class Main
             }
             else
                 System.out.println("Unknown camera in cameraConfigs");
-        }
-
-        // see if USB Flash Drive mounted and if so, log the images
-        {
-            final File NoFlashDriveMounted = new File("/mnt/usb/NoFlashDriveMounted");
-            if (NoFlashDriveMounted.exists())
-            {
-                logImage = false;
-                System.out.println("No Flash Drive Mounted");
-            }
-            else
-            {
-                logImage = true;
-                System.out.println("Flash Drive Mounted and image logging is on");
-            }
         }
 
         // start processed iamges merge and serve thread
@@ -356,4 +394,4 @@ public class Main
             }
         }
     }
-}
+    }
