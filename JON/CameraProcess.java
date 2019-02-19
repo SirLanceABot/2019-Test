@@ -192,11 +192,11 @@ public class CameraProcess implements Runnable
 						filename = file.toString();
 						if (!Imgcodecs.imwrite(filename, mat))
 						{
-							System.out.println("Error writing BR");
+							System.out.println("[CameraProcess] Error writing BR");
 						}
 					} catch (Exception e)
 					{
-						System.out.println("Error saving image file" + e.toString());
+						System.out.println("[CameraProcess] Error saving image file" + e.toString());
 					}
 				}
 
@@ -233,11 +233,11 @@ public class CameraProcess implements Runnable
 					filename = file.toString();
 					if (!Imgcodecs.imwrite(filename, mat))
 					{
-						System.out.println("Error writing B");
+						System.out.println("[CameraProcess] Error writing B");
 					}
 				} catch (Exception e)
 				{
-					System.out.println("Error saving image file" + e.toString());
+					System.out.println("[CameraProcess] Error saving image file" + e.toString());
 				}
 			}
 

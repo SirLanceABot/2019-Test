@@ -63,7 +63,7 @@ public class TargetSelection
 
 			if (debuggingEnabled)
 			{
-				System.out.println("[CameraProcess] No Contours");
+				System.out.println("[TargetSelection] No Contours");
 
 				// Display a message if no contours are found.
 				Imgproc.putText(mat, "No Contours", new Point(20, 20), Core.FONT_HERSHEY_SIMPLEX, 0.25,
@@ -78,7 +78,7 @@ public class TargetSelection
 
 			if (debuggingEnabled)
 			{
-				System.out.println("[CameraProcess] " + filteredContours.size() + " contours");
+				System.out.println("[TargetSelection] " + filteredContours.size() + " contours");
 
 				// Draw all contours at once (negative index).
 				// Positive thickness means not filled, negative thickness means filled.
@@ -113,7 +113,7 @@ public class TargetSelection
 
 				if (debuggingEnabled)
 				{
-					System.out.println("[CameraProcess] " + contour.size() + " points in contour");
+					System.out.println("[TargetSelection] " + contour.size() + " points in contour");
 
 					// Draw marks at the center of gravity.
 					Imgproc.drawMarker(mat, new Point(cogX, cogY), new Scalar(255, 255, 255), Imgproc.MARKER_CROSS, 10,

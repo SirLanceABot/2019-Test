@@ -157,7 +157,7 @@ public class Main
         JsonElement nameElement = config.get("name");
         if (nameElement == null)
         {
-            parseError("could not read camera name");
+            parseError("[main] could not read camera name");
             return false;
         }
         cam.name = nameElement.getAsString();
@@ -166,7 +166,7 @@ public class Main
         JsonElement pathElement = config.get("path");
         if (pathElement == null)
         {
-            parseError("camera '" + cam.name + "': could not read path");
+            parseError("[main] camera '" + cam.name + "': could not read path");
             return false;
         }
         cam.path = pathElement.getAsString();
@@ -193,14 +193,14 @@ public class Main
             top = new JsonParser().parse(Files.newBufferedReader(Paths.get(configFile)));
         } catch (IOException ex)
         {
-            System.err.println("could not open '" + configFile + "': " + ex);
+            System.err.println("[main] could not open '" + configFile + "': " + ex);
             return false;
         }
 
         // top level must be an object
         if (!top.isJsonObject())
         {
-            parseError("must be JSON object");
+            parseError("[main] must be JSON object");
             return false;
         }
         JsonObject obj = top.getAsJsonObject();
@@ -209,7 +209,7 @@ public class Main
         JsonElement teamElement = obj.get("team");
         if (teamElement == null)
         {
-            parseError("could not read team number");
+            parseError("[main] could not read team number");
             return false;
         }
         team = teamElement.getAsInt();
@@ -228,7 +228,7 @@ public class Main
             }
             else
             {
-                parseError("could not understand ntmode value '" + str + "'");
+                parseError("[main] could not understand ntmode value '" + str + "'");
             }
         }
 
@@ -236,7 +236,7 @@ public class Main
         JsonElement camerasElement = obj.get("cameras");
         if (camerasElement == null)
         {
-            parseError("could not read cameras");
+            parseError("[main] could not read cameras");
             return false;
         }
         JsonArray cameras = camerasElement.getAsJsonArray();
@@ -256,7 +256,7 @@ public class Main
      */
     public static VideoSource startCamera(CameraConfig config, int port)
     {
-        System.out.println(config.name + " camera on USB path " + config.path);
+        System.out.println("[main] " + config.name + " camera on USB path " + config.path);
         // CameraServer inst = CameraServer.getInstance();
         UsbCamera camera = new UsbCamera(config.name, config.path);
 
@@ -281,6 +281,7 @@ public class Main
      */
     public static void main(String... args)
     {
+        Thread.currentThread().setName("4237Main");
 
         if (args.length > 0)
         {
@@ -303,23 +304,23 @@ public class Main
         NetworkTableInstance ntinst = NetworkTableInstance.getDefault();
         if (server)
         {
-            System.out.println("Setting up NetworkTables server");
+            System.out.println("[main] Setting up NetworkTables server");
             ntinst.startServer();
         }
         else
         {
-            System.out.println("Setting up NetworkTables client for team " + team);
+            System.out.println("[main] Setting up NetworkTables client for team " + team);
             ntinst.startClientTeam(team);
         }
 
         // see if USB Flash Drive mounted and if so, log the images
         try
         {
-            System.out.println("Parent sleeping 3 seconds so auto mount will be done");
+            System.out.println("[main] Parent sleeping 3 seconds so auto mount will be done");
             Thread.sleep(3000);
         } catch (InterruptedException exc)
         {
-            System.out.println("Sleep 3 seconds was interrupted");
+            System.out.println("[main] Sleep 3 seconds was interrupted");
         }
 
         try
@@ -331,19 +332,19 @@ public class Main
             command.add("mountpoint -q /mnt/usb ; echo $?");
 
             // execute command
-            System.out.println("Run mountpoint /mnt/usb command");
+            System.out.println("[main] Run mountpoint /mnt/usb command");
             ProcessBuilder pb1 = new ProcessBuilder(command);
             Process process1 = pb1.start();
             int errCode1 = process1.waitFor();
             command.clear();
-            System.out.println("mountpoint command executed, any errors? " + (errCode1 == 0 ? "No" : "Yes"));
+            System.out.println("[main] mountpoint command executed, any errors? " + (errCode1 == 0 ? "No" : "Yes"));
             String mountOutput = output(process1.getInputStream());
-            System.out.println("mountpoint output:\n" + mountOutput);
-            System.out.println("mountpoint errors:\n" + output(process1.getErrorStream()));
+            System.out.println("[main] mountpoint output:\n" + mountOutput);
+            System.out.println("[main] mountpoint errors:\n" + output(process1.getErrorStream()));
             logImage = mountOutput.startsWith("0");
             if (logImage)
             {
-                System.out.println("Flash Drive Mounted /mnt/usb and image logging is on");
+                System.out.println("[main] Flash Drive Mounted /mnt/usb and image logging is on");
                 // mkdir in case they don't exist. Don't bother checking for existance - just do
                 // it.
 
@@ -352,20 +353,20 @@ public class Main
                 command.add("sudo mkdir /mnt/usb/B /mnt/usb/BR /mnt/usb/E /mnt/usb/ER");
 
                 // execute command
-                System.out.println("Run mkdir B BR E ER command");
+                System.out.println("[main] Run mkdir B BR E ER command");
                 ProcessBuilder pb2 = new ProcessBuilder(command);
                 Process process2 = pb2.start();
                 int errCode2 = process2.waitFor();
-                System.out.println("mkdir command executed, any errors? " + (errCode2 == 0 ? "No" : "Yes"));
-                System.out.println("mkdir output:\n" + output(process2.getInputStream()));
-                System.out.println("mkdir errors:\n" + output(process2.getErrorStream()));
+                System.out.println("[main] mkdir command executed, any errors? " + (errCode2 == 0 ? "No" : "Yes"));
+                System.out.println("[main] mkdir output:\n" + output(process2.getInputStream()));
+                System.out.println("[main] mkdir errors:\n" + output(process2.getErrorStream()));
             }
             else
-                System.out.println("No Flash Drive Mounted");
+                System.out.println("[main] No Flash Drive Mounted");
 
         } catch (Exception ex2)
         {
-            System.out.println("Error in mount process " + ex2);
+            System.out.println("[main] Error in mount process " + ex2);
         }
 
         System.out.flush();
@@ -376,21 +377,23 @@ public class Main
 
             if (cameraConfig.name.equalsIgnoreCase("Bumper"))
             {
-                System.out.println("Starting Bumper camera port 1181");
+                System.out.println("[main] Starting Bumper camera port 1181");
                 cp = new CameraProcess(startCamera(cameraConfig, 1181));
-                visionThread = new Thread(cp);
+                visionThread = new Thread(cp, "4237BumperCamera");
+                visionThread.setName("4237BumperCamera");
                 visionThread.start(); // start thread using the class' run() method (just saying run() won't start a
                                       // thread - that just runs run() once)
             }
             else if (cameraConfig.name.equalsIgnoreCase("Elevator"))
             {
-                System.out.println("Starting Elevator camera on port 1182");
+                System.out.println("[main] Starting Elevator camera on port 1182");
                 cpB = new CameraProcessB(startCamera(cameraConfig, 1182));
-                visionThreadB = new Thread(cpB);
+                visionThreadB = new Thread(cpB, "4237ElevatorCamera");
+                //visionThreadB.setName("4237ElevatorCamera");
                 visionThreadB.start();
             }
             else
-                System.out.println("Unknown camera in cameraConfigs");
+                System.out.println("[main] Unknown camera in cameraConfigs");
         }
 
         // start processed iamges merge and serve thread
@@ -404,7 +407,8 @@ public class Main
         }
 
         imageDriver = new ImageMerge();
-        imageMergeThread = new Thread(imageDriver);
+        imageMergeThread = new Thread(imageDriver, "4237ImageMerge");
+        //imageMergeThread.setName("4237ImageMerge");
         imageMergeThread.start();
 
         // visionThread.setDaemon(true); // defines a sort of "background" task that

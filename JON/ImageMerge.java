@@ -14,7 +14,7 @@ public class ImageMerge implements Runnable
     @Override
     public void run()
     {
-        System.out.println("ImageMerge Thread Started");
+        System.out.println("[ImageMerge] Thread Started");
 
         Mat ImageOverlay = new Mat(); // main image from elevator
         Mat ImageOutput = new Mat(); // main image from elevator + small bumper image inserted then weighted merge
@@ -69,7 +69,7 @@ public class ImageMerge implements Runnable
                 outputStream.putFrame(ImageOutput);
              } catch (Exception e)
             {
-                System.out.println("ImageMerge error " + e);
+                System.out.println("[ImageMerge] error " + e);
             }
         }
     }

@@ -75,7 +75,7 @@ public class UdpReceive extends Thread
 
     public void run()
     {
-        System.out.println("UDP packet listener thread started");
+        System.out.println("[UDPReceive] packet listener thread started");
         byte[] buf = new byte[256];
         final int bufLength = buf.length; // save original length because length property is changed with usage
         DatagramPacket packet = new DatagramPacket(buf, bufLength);
@@ -95,7 +95,7 @@ public class UdpReceive extends Thread
                 {
                     String message = new String(lastDataReceived.substring("Bumper ".length()));
                     TargetData receivedTarget = new TargetData();
-                    System.out.print("Bumper ");
+                    System.out.print("[UDPReceive] Bumper ");
                     receivedTarget.fromJson(message);
                }
 
@@ -103,18 +103,18 @@ public class UdpReceive extends Thread
                 {
                     String message = new String(lastDataReceived.substring("Elevator ".length()));
                     TargetData receivedTargetB = new TargetData();
-                    System.out.print("Elevator ");
+                    System.out.print("[UDPReceive] Elevator ");
                     receivedTargetB.fromJson(message);
                 }
 
                 else
                 {
-                    System.out.println("Unknown class received UDP " + lastDataReceived);
+                    System.out.println("[UDPReceive] Unknown class received UDP " + lastDataReceived);
                 }
             } catch (SocketTimeoutException e)
             {
                 // do something when no messages for awhile
-                System.out.println("haven't heard from the vision pipeline for awhile");
+                System.out.println("[UDPReceive] hasn't heard from the vision pipeline for awhile");
             } catch (IOException e)
             {
                 e.printStackTrace();
