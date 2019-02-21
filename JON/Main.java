@@ -7,8 +7,7 @@ Download frcvision image
 Load image on SD card with balena Etcher [or others]
 Add auto mount of our camera image log USB flash drive to /etc/fstab
 Make camera image log directory mount point [mkdir /mnt/usb]
-Add a file to indicate boot system or the mounted flash drive system [touch /mnt/usb/NoFlashDriveMounted]
-On the flash drive(s) make the directories for the camera images
+Directories for the camera images on the flash drive are automatically made if the flash drive is inserted before our program runs
    [mkdir /mnt/usb/B; mkdir /mnt/usb/BR; mkdir /mnt/usb/E; mkdir /mnt/usb/ER]
 Configure cameras [browser frcvision.local/]
 
@@ -42,6 +41,7 @@ import com.google.gson.JsonParser;
 import edu.wpi.cscore.MjpegServer;
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.cscore.VideoSource;
+import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.networktables.NetworkTableInstance;
 
 /*
@@ -254,14 +254,19 @@ public class Main
     /**
      * Start running the camera.
      */
-    public static VideoSource startCamera(CameraConfig config, int port)
+    public static VideoSource startCamera(CameraConfig config)
     {
         System.out.println("[main] " + config.name + " camera on USB path " + config.path);
-        // CameraServer inst = CameraServer.getInstance();
-        UsbCamera camera = new UsbCamera(config.name, config.path);
 
-        MjpegServer server = new MjpegServer("serve_" + config.name, port);
-        server.setSource(camera);
+        // this 
+        CameraServer inst = CameraServer.getInstance();
+        UsbCamera camera = new UsbCamera(config.name, config.path);
+        MjpegServer server = inst.startAutomaticCapture(camera);
+
+        // or this and need port to be passed in
+        // UsbCamera camera = new UsbCamera(config.name, config.path);
+        // MjpegServer server = new MjpegServer("serve_" + config.name, port);
+        // server.setSource(camera);
 
         Gson gson = new GsonBuilder().create();
 
@@ -377,21 +382,21 @@ public class Main
 
             if (cameraConfig.name.equalsIgnoreCase("Bumper"))
             {
-                System.out.println("[main] Starting Bumper camera port 1181");
-                cp = new CameraProcess(startCamera(cameraConfig, 1181));
+                System.out.println("[main] Starting Bumper camera");
+                cp = new CameraProcess(startCamera(cameraConfig));
                 visionThread = new Thread(cp, "4237BumperCamera");
                 visionThread.start(); // start thread using the class' run() method (just saying run() won't start a
                                       // thread - that just runs run() once)
             }
             else if (cameraConfig.name.equalsIgnoreCase("Elevator"))
             {
-                System.out.println("[main] Starting Elevator camera on port 1182");
-                cpB = new CameraProcessB(startCamera(cameraConfig, 1182));
+                System.out.println("[main] Starting Elevator camera");
+                cpB = new CameraProcessB(startCamera(cameraConfig));
                 visionThreadB = new Thread(cpB, "4237ElevatorCamera");
-                 visionThreadB.start();
+                visionThreadB.start();
             }
             else
-                System.out.println("[main] Unknown camera in cameraConfigs");
+                System.out.println("[main] Unknown camera in cameraConfigs " + cameraConfig.name);
         }
 
         // start processed iamges merge and serve thread

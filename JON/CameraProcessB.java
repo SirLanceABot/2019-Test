@@ -8,15 +8,19 @@
 
 import java.io.File;
 
+import org.opencv.core.Core;
+import org.opencv.core.CvType;
 import org.opencv.core.Mat;
+import org.opencv.core.Point;
+import org.opencv.core.Scalar;
 import org.opencv.imgcodecs.Imgcodecs;
-import org.opencv.video.Video;
+import org.opencv.imgproc.Imgproc;
 
 import edu.wpi.cscore.CvSink;
 import edu.wpi.cscore.CvSource;
 import edu.wpi.cscore.MjpegServer;
-import edu.wpi.cscore.VideoMode;
 import edu.wpi.cscore.VideoSource;
+import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.Timer;
 
 /**
@@ -50,7 +54,7 @@ public class CameraProcessB implements Runnable
 	// This object is used to store the camera frame returned from the inputStream
 	// Mats require a lot of memory. Placing this in a loop will cause an 'out of
 	// memory' error.
-	private Mat mat = new Mat();
+	private Mat mat = new Mat(240, 320, CvType.CV_8UC3); 
 
 	// This object is used to track the time of each iteration of the thread loop.
 	private Timer timer = new Timer();
@@ -136,21 +140,26 @@ public class CameraProcessB implements Runnable
 	 */
 	public void run()
 	{
+		this.setDebuggingEnabled(true);
+
 		// This variable will be used to time each iteration of the thread loop.
 		double loopStartTime = -999.0;
+		double loopTargetTime = -999.0;
+		double loopCameraTime = -999.0;
 
 		// Set up the input stream to get frames from the camera.
 		// inputStream = CameraServer.getInstance().getVideo();
 		inputStream = new CvSink("cvsink");
 		inputStream.setSource(camera);
 
-		// Set up the output stream to send images to the dashboard.
-		// outputStream = CameraServer.getInstance().putVideo(cameraName, cameraWidth,
-		// cameraHeight);
-		outputStream = new CvSource("Elevator", VideoMode.PixelFormat.kMJPEG, 320, 240, 30);
+		outputStream = CameraServer.getInstance().putVideo("ElevatorContours", 320, 240);
 
-		mjpegserver2 = new MjpegServer("serve_Elevator", 1184);
-		mjpegserver2.setSource(outputStream);
+		// Set up the output stream to send images to the dashboard.
+		// outputStream = CameraServer.getInstance().putVideo(cameraName, cameraWidth,cameraHeight);
+		// or
+		// outputStream = new CvSource("Elevator", VideoMode.PixelFormat.kMJPEG, 320, 240, 30);
+		// mjpegserver2 = new MjpegServer("serve_Elevator", 1184);
+		// mjpegserver2.setSource(outputStream);
 
 		// Reset and start the timer to time each iteration of the thread loop.
 		timer.reset();
@@ -172,16 +181,21 @@ public class CameraProcessB implements Runnable
 			// Tell the input stream to grab a frame from the camera and store it to the
 			// mat.
 			// Check if there was an error with the frame grab.
+			loopCameraTime = timer.get();
 			if (inputStream.grabFrame(mat) == 0)
 			{
-				if (debuggingEnabled)
-				{
-					outputStream.notifyError(inputStream.getError());
-				}
+				System.out.println("[CameraProcessB] grabFrame error " + inputStream.getError());
+				mat.setTo(new Scalar(100,100,100));
+				// if (debuggingEnabled)
+				// {
+				// 	outputStream.notifyError(inputStream.getError());
+				// }
 			}
-			else // if there was no error with the frame grab...
+			loopCameraTime = timer.get() - loopCameraTime;
+			//else // if there was no error with the frame grab...
 			{
-				Main.elevatorCamera.setImage(mat);
+				// Scaling if needed to reduce ethernet load - this causes small problems in image merge
+                // Imgproc.resize(mat, mat, new Size(), 0.8, 0.8, Imgproc.INTER_AREA);
 
 				if (Main.logImage)
 				{
@@ -200,21 +214,16 @@ public class CameraProcessB implements Runnable
 					}
 				}
 
+				Main.elevatorCamera.setImage(mat);
+
 				// Call the process() method that was created by the user to process the camera
 				// frame.
-				targetSelection.process(mat, nextTargetData);
-
-				if (debuggingEnabled)
-				{
-					// Display the camera frame in the output stream.
-					outputStream.putFrame(mat);
-				}
+				loopTargetTime = timer.get();
+				targetSelection.process(mat, nextTargetData); // sets currentTargetData from nextTargetData
+				loopTargetTime = timer.get() - loopTargetTime;	
 			}
 
-			if (debuggingEnabled)
-			{
-				System.out.println("[CameraProcessB] " + 1.0 / (timer.get() - loopStartTime) + " FPS");
-			}
+			Main.elevatorPipeline.setImage(mat);
 
 			// The synchronized set() method is ONLY called twice.
 			// (1) Here in the thread loop and (2) after the thread loop is terminated
@@ -222,7 +231,6 @@ public class CameraProcessB implements Runnable
 			set(nextTargetData);
 
 			Main.sendMessage.Communicate("Elevator " + currentTargetData.toJson());
-			Main.elevatorPipeline.setImage(mat);
 
 			if (Main.logImage)
 			{
@@ -241,6 +249,21 @@ public class CameraProcessB implements Runnable
 				}
 			}
 
+			if (debuggingEnabled)
+			{
+				// Display the camera frame in the output stream.
+				Imgproc.putText(mat, "Elevator Contours", new Point(25, 30), Core.FONT_HERSHEY_SIMPLEX, 0.5,
+				new Scalar(100, 100, 255), 1);
+				outputStream.putFrame(mat);
+			}
+
+			if (debuggingEnabled)
+			{
+				double loopTime =timer.get() - loopStartTime;
+				System.out.println("[CameraProcessB] " + 1.0/loopTime + " FPS, total time "
+				 + loopTime + ", target time " + loopTargetTime
+				 + ", camera time " + loopCameraTime);
+				}
 		} // End of the thread loop
 
 		// The thread loop was interrupted so reset the target data.

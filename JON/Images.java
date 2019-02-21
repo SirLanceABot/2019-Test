@@ -18,7 +18,7 @@ public class Images
         // System.out.println("setImage notifying");
         anImage = aImage;
         isFreshImage = true;
-        notify();
+       notify();
     }
 
     public synchronized Mat getImage() throws InterruptedException
@@ -27,7 +27,7 @@ public class Images
         if (!isFreshImage)
         {
             // System.out.println("getImage wait for fresh image");
-            wait();
+           wait();
         }
         isFreshImage = false;
         // System.out.println("getImage done waiting - returning fresh Mat");
