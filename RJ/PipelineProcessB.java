@@ -166,7 +166,7 @@ public class PipelineProcessB implements Runnable
 			if (debuggingEnabled)
 			{
 				loopStartTime = timer.get();
-				// System.out.println("[CameraProcessB] Loop Thread Start Time = " +
+				// System.out.println("[PipelineProcessB] Loop Thread Start Time = " +
 				// loopStartTime);
 			}
 
@@ -196,11 +196,11 @@ public class PipelineProcessB implements Runnable
 						filename = file.toString();
 						if (!Imgcodecs.imwrite(filename, mat))
 						{
-							System.out.println("[CameraProcessB] Error writing ER");
+							System.out.println("[PipelineProcessB] Error writing ER");
 						}
 					} catch (Exception e)
 					{
-						System.out.println("[CameraProcessB] Error saving image file" + e.toString());
+						System.out.println("[PipelineProcessB] Error saving image file" + e.toString());
 					}
 				}
 
@@ -235,11 +235,11 @@ public class PipelineProcessB implements Runnable
 					filename = file.toString();
 					if (!Imgcodecs.imwrite(filename, mat))
 					{
-						System.out.println("[CameraProcessB] Error writing E");
+						System.out.println("[PipelineProcessB] Error writing E");
 					}
 				} catch (Exception e)
 				{
-					System.out.println("[CameraProcessB] Error saving image file" + e.toString());
+					System.out.println("[PipelineProcessB] Error saving image file" + e.toString());
 				}
 			}
 
@@ -254,7 +254,7 @@ public class PipelineProcessB implements Runnable
 			if (debuggingEnabled)
 			{
 				double loopTime = timer.get() - loopStartTime;
-				System.out.println("[CameraProcessB] " + 1.0 / loopTime + " FPS, total time " + loopTime
+				System.out.println("[PipelineProcessB] " + 1.0 / loopTime + " FPS, total time " + loopTime
 						+ ", target time " + loopTargetTime + ", camera time " + loopCameraTime);
 			}
 		} // End of the thread loop
@@ -272,7 +272,7 @@ public class PipelineProcessB implements Runnable
 
 		if (debuggingEnabled)
 		{
-			System.out.println("[CameraProcessB] Camera Frame Grab Interrupted and Ended Thread");
+			System.out.println("[PipelineProcessB] Camera Frame Grab Interrupted and Ended Thread");
 		}
 	}
 

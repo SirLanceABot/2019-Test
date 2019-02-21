@@ -165,7 +165,7 @@ public class PipelineProcess implements Runnable
 			if (debuggingEnabled)
 			{
 				loopStartTime = timer.get();
-				// System.out.println("[CameraProcess] Loop Thread Start Time = " +
+				// System.out.println("[PipelineProcess] Loop Thread Start Time = " +
 				// loopStartTime);
 			}
 
@@ -195,11 +195,11 @@ public class PipelineProcess implements Runnable
 						filename = file.toString();
 						if (!Imgcodecs.imwrite(filename, mat))
 						{
-							System.out.println("[CameraProcess] Error writing BR");
+							System.out.println("[PipelineProcess] Error writing BR");
 						}
 					} catch (Exception e)
 					{
-						System.out.println("[CameraProcess] Error saving image file" + e.toString());
+						System.out.println("[PipelineProcess] Error saving image file" + e.toString());
 					}
 				}
 
@@ -234,11 +234,11 @@ public class PipelineProcess implements Runnable
 					filename = file.toString();
 					if (!Imgcodecs.imwrite(filename, mat))
 					{
-						System.out.println("[CameraProcess] Error writing B");
+						System.out.println("[PipelineProcess] Error writing B");
 					}
 				} catch (Exception e)
 				{
-					System.out.println("[CameraProcess] Error saving image file" + e.toString());
+					System.out.println("[PipelineProcess] Error saving image file" + e.toString());
 				}
 			}
 
@@ -253,7 +253,7 @@ public class PipelineProcess implements Runnable
 			if (debuggingEnabled)
 			{
 				double loopTime =timer.get() - loopStartTime;
-				System.out.println("[CameraProcess] " + 1.0 / loopTime + " FPS, total time " + loopTime
+				System.out.println("[PipelineProcess] " + 1.0 / loopTime + " FPS, total time " + loopTime
 						+ ", target time " + loopTargetTime + ", camera time " + loopCameraTime);
 	   }
 		} // End of the thread loop
@@ -271,7 +271,7 @@ public class PipelineProcess implements Runnable
 
 		if (debuggingEnabled)
 		{
-			System.out.println("[CameraProcess] Camera Frame Grab Interrupted and Ended Thread");
+			System.out.println("[PipelineProcess] Camera Frame Grab Interrupted and Ended Thread");
 		}
 	}
 
