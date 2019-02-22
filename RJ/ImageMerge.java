@@ -6,15 +6,13 @@ import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 
 import edu.wpi.cscore.CvSource;
-import edu.wpi.cscore.MjpegServer;
-import edu.wpi.cscore.VideoMode;
 import edu.wpi.first.cameraserver.CameraServer;
 
 public class ImageMerge implements Runnable
 {
     // This object is used to send the image to the Dashboard
     private CvSource outputStream;
-    
+
     @Override
     public void run()
     {
@@ -29,8 +27,10 @@ public class ImageMerge implements Runnable
 
         outputStream = CameraServer.getInstance().putVideo("MergedImages", 320, 240);
 
-        // CvSource outputStream = new CvSource("DriverView", VideoMode.PixelFormat.kMJPEG, 320, 240, 30);
-        // // CvSource cvsource = new CvSource("cvsource", VideoMode.PixelFormat.kMJPEG, width, height, frames_per_sec);
+        // CvSource outputStream = new CvSource("DriverView",
+        // VideoMode.PixelFormat.kMJPEG, 320, 240, 30);
+        // // CvSource cvsource = new CvSource("cvsource", VideoMode.PixelFormat.kMJPEG,
+        // width, height, frames_per_sec);
 
         // MjpegServer mjpegServer = new MjpegServer("serve_DriverView", 1185);
 
@@ -40,40 +40,43 @@ public class ImageMerge implements Runnable
         {
             try
             {
-                if (Main.elevatorPipeline.getImage().dims() <= 1)
+                // only get these images from Main once because they will wait for FRESH and the second get would be STALE
+                Main.obj.elevatorPipeline.getImage().copyTo(ImageOverlay); // get the primary elevator image
+                Main.obj.bumperPipeline.getImage().copyTo(insert); // get the insert bumper image
+
+                if (ImageOverlay.dims() <= 1)
                 {
                     System.out.println("ImageMerge] elevator too few dimensions");
-                    Main.bumperPipeline.getImage().copyTo(ImageOutput);
-                    Imgproc.putText(ImageOutput, "Bumper Contours Only", new Point(25, 30), Core.FONT_HERSHEY_SIMPLEX, 0.5,
-                    new Scalar(100, 100, 255), 1);
+                    insert.copyTo(ImageOutput);
+                    Imgproc.putText(ImageOutput, "Bumper Contours Only", new Point(25, 30), Core.FONT_HERSHEY_SIMPLEX,
+                            0.5, new Scalar(100, 100, 255), 1);
                 }
-                else if (Main.bumperPipeline.getImage().dims() <= 1)
+                else if (insert.dims() <= 1)
                 {
                     System.out.println("ImageMerge] bumper too few dimensions");
-                    Main.elevatorPipeline.getImage().copyTo(ImageOutput);
-                    Imgproc.putText(ImageOutput, "Elevator Contours Only", new Point(25, 30), Core.FONT_HERSHEY_SIMPLEX, 0.5,
-                    new Scalar(100, 100, 255), 1);
+                    ImageOverlay.copyTo(ImageOutput);
+                    Imgproc.putText(ImageOutput, "Elevator Contours Only", new Point(25, 30), Core.FONT_HERSHEY_SIMPLEX,
+                            0.5, new Scalar(100, 100, 255), 1);
                 }
                 else
                 {
-                    // start with both images the elevator
-                    Main.elevatorPipeline.getImage().copyTo(ImageOverlay);
+                    // start with output image the elevator
                     ImageOverlay.copyTo(ImageOutput);
-
-                    Main.bumperPipeline.getImage().copyTo(insert); // get the insert bumper image
-
+  
                     // Scaling the insert smaller
                     // Imgproc.resize(insert, insertSmall, new Size(insert.rows() / 3, insert.rows()
                     // / 3), 0, 0, Imgproc.INTER_AREA);
-                    Imgproc.resize(insert, insertSmall, new Size(), 0.5, 0.5, Imgproc.INTER_AREA);
+                    Imgproc.resize(insert, insertSmall, new Size(), 0.6, 0.6, Imgproc.INTER_AREA);
 
                     // locate the small insert on the overlay
                     int rowStart = ImageOutput.rows() - insertSmall.rows(); // for top/down put at bottom
                     int rowEnd = rowStart + insertSmall.rows();
-                    int colStart = (ImageOutput.cols() - insertSmall.cols()) / 2; // for left/right align centers of the two images
+                    int colStart = (ImageOutput.cols() - insertSmall.cols()) / 2; // for left/right align centers of the
+                                                                                  // two images
                     int colEnd = colStart + insertSmall.cols();
 
-                    subMat = ImageOverlay.submat(rowStart, rowEnd, colStart, colEnd); // define the insert area on the main image
+                    subMat = ImageOverlay.submat(rowStart, rowEnd, colStart, colEnd); // define the insert area on the
+                                                                                      // main image
 
                     insertSmall.copyTo(subMat); // copy the insert to the overlay's insert area
                     double alpha = 0.85f;

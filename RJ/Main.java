@@ -38,6 +38,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+import org.opencv.core.Core;
+
 import edu.wpi.cscore.MjpegServer;
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.cscore.VideoSource;
@@ -111,26 +113,27 @@ public class Main
         public JsonElement streamConfig;
     }
 
-    public static CameraProcess cp;
-    public static CameraProcessB cpB;
-    public static ImageMerge imageDriver;
+    private static CameraProcess cp;
+    private static CameraProcessB cpB;
+    private static ImageMerge imageDriver;
 
-    public static Thread visionThread;
-    public static Thread visionThreadB;
-    public static Thread imageMergeThread;
+    private static Thread visionThread;
+    private static Thread visionThreadB;
+    private static Thread imageMergeThread;
 
     // TODO:
     // all messages go to one UDP sender defined for one port but could have two
     // senders on different ports if that makes it easier to separate the messages
-    public static UdpSend sendMessage = new UdpSend(5800);
+    protected static UdpSend sendMessage = new UdpSend(5800);
 
-    public static UdpReceive testUDPreceive; // test UDP receiver in place of a roboRIO
-    public static Thread UDPreceiveThread; // remove these or at least don't start this thread if using the roboRIO
+    private static UdpReceive testUDPreceive; // test UDP receiver in place of a roboRIO
+    private static Thread UDPreceiveThread; // remove these or at least don't start this thread if using the roboRIO
 
-    static Images bumperCamera = new Images();
-    static Images bumperPipeline = new Images();
-    static Images elevatorCamera = new Images();
-    static Images elevatorPipeline = new Images();
+    static Main obj;
+    Images bumperCamera;
+    Images bumperPipeline;
+    Images elevatorCamera;
+    Images elevatorPipeline;
 
     static boolean logImage = false;
 
@@ -258,7 +261,7 @@ public class Main
     {
         System.out.println("[main] " + config.name + " camera on USB path " + config.path);
 
-        // this 
+        // this
         CameraServer inst = CameraServer.getInstance();
         UsbCamera camera = new UsbCamera(config.name, config.path);
         MjpegServer server = inst.startAutomaticCapture(camera);
@@ -288,6 +291,8 @@ public class Main
     {
         Thread.currentThread().setName("4237Main");
 
+        System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+
         if (args.length > 0)
         {
             configFile = args[0];
@@ -298,6 +303,12 @@ public class Main
         {
             return;
         }
+
+        obj = new Main(); // instantiate Main class to provide for the Images' Mats
+        Main.obj.bumperCamera = new Images();
+        Main.obj.bumperPipeline = new Images();
+        Main.obj.elevatorCamera = new Images();
+        Main.obj.elevatorPipeline = new Images();
 
         // start test UDP receiver since we don't have a roboRIO to test with - this
         // would go on the roboRIO not here on the RPi
@@ -321,7 +332,7 @@ public class Main
         // see if USB Flash Drive mounted and if so, log the images
         try
         {
-            System.out.println("[main] Parent sleeping 3 seconds so auto mount will be done");
+            System.out.println("[main] Parent sleeping 3 seconds so auto mount will be done by now, we are hopeful.");
             Thread.sleep(3000);
         } catch (InterruptedException exc)
         {
@@ -330,13 +341,12 @@ public class Main
 
         try
         {
+            // execute command to check for flash drive mounted
             List<String> command = new ArrayList<String>(); // build my command as a list of strings
-
             command.add("bash");
             command.add("-c");
             command.add("mountpoint -q /mnt/usb ; echo $?");
 
-            // execute command
             System.out.println("[main] Run mountpoint /mnt/usb command");
             ProcessBuilder pb1 = new ProcessBuilder(command);
             Process process1 = pb1.start();
@@ -386,7 +396,7 @@ public class Main
                 cp = new CameraProcess(startCamera(cameraConfig));
                 visionThread = new Thread(cp, "4237BumperCamera");
                 visionThread.start(); // start thread using the class' run() method (just saying run() won't start a
-                                      // thread - that just runs run() once)
+                // thread - that just runs run() once)
             }
             else if (cameraConfig.name.equalsIgnoreCase("Elevator"))
             {
@@ -399,7 +409,7 @@ public class Main
                 System.out.println("[main] Unknown camera in cameraConfigs " + cameraConfig.name);
         }
 
-        // start processed iamges merge and serve thread
+        // start processed images merge and serve thread
         try
         {
             // Wait for other processes to make some images otherwise first time though gets

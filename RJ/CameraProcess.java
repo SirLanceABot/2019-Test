@@ -19,8 +19,8 @@ public class CameraProcess implements Runnable
 	private String cameraName = "Bumper Camera";
 	private int cameraWidth = 160;
 	private int cameraHeight = 120;
-	public static PipelineProcess pipelineProcess;
-	public static Thread pipeline;
+	private PipelineProcess pipelineProcess = new PipelineProcess(this);
+	private Thread pipeline;
 
 	// This object is used to capture frames from the camera.
 	// The captured image is stored to a Mat
@@ -29,7 +29,8 @@ public class CameraProcess implements Runnable
 	// This object is used to store the camera frame returned from the inputStream
 	// Mats require a lot of memory. Placing this in a loop will cause an 'out of
 	// memory' error.
-	protected static CameraFrame cameraFrame = new CameraFrame(120, 160);
+	protected Mat cameraFrame = new Mat();
+	protected boolean isFreshImage = false;
 	private Mat cameraFrameTemp = new Mat(120, 160, CvType.CV_8UC3);
 
 	// This object is used to track the time of each iteration of the thread loop.
@@ -104,12 +105,15 @@ public class CameraProcess implements Runnable
 
 		System.out.println("[CameraProcess] Starting Bumper pipeline");
 
-		pipelineProcess = new PipelineProcess();
+		pipelineProcess = new PipelineProcess(this);
 		pipeline = new Thread(pipelineProcess, "4237BumperPipeline");
 		pipeline.start();
-		try{
+		try
+		{
 			Thread.sleep(3000);
-		}catch(Exception e){}
+		} catch (Exception e)
+		{
+		}
 
 		this.setDebuggingEnabled(true);
 
@@ -137,7 +141,12 @@ public class CameraProcess implements Runnable
 				cameraFrameTemp.setTo(new Scalar(100, 100, 100));
 			}
 
-			cameraFrame.setImage(cameraFrameTemp);
+			synchronized (this.cameraFrame)
+			{
+				cameraFrameTemp.copyTo(this.cameraFrame);
+				this.isFreshImage = true;
+				this.cameraFrame.notify();
+			}
 
 			loopCameraTime = timer.get() - loopCameraTime;
 

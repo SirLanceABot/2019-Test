@@ -24,11 +24,17 @@ import org.opencv.imgproc.Imgproc;
  */
 public class TargetSelection
 {
+	private String id;
 	// This object is used to run the GripPipeline
 	private GripPipelineYellowCube gripPipelineYellowCube = new GripPipelineYellowCube();
 
 	// This field is used to determine if debugging information should be displayed.
 	private boolean debuggingEnabled = false;
+
+	TargetSelection(String id)
+	{
+		this.id = id;
+	}
 
 	/**
 	 * This method sets the field to display debugging information.
@@ -63,7 +69,7 @@ public class TargetSelection
 
 			if (debuggingEnabled)
 			{
-				System.out.println("[TargetSelection] No Contours");
+				System.out.println("[TargetSelection " + id + "] No Contours");
 
 				// Display a message if no contours are found.
 				Imgproc.putText(mat, "No Contours", new Point(20, 20), Core.FONT_HERSHEY_SIMPLEX, 0.25,
@@ -78,7 +84,7 @@ public class TargetSelection
 
 			if (debuggingEnabled)
 			{
-				System.out.println("[TargetSelection] " + filteredContours.size() + " contours");
+				System.out.println("[TargetSelection " + id + "] " + filteredContours.size() + " contours");
 
 				// Draw all contours at once (negative index).
 				// Positive thickness means not filled, negative thickness means filled.
@@ -113,7 +119,7 @@ public class TargetSelection
 
 				if (debuggingEnabled)
 				{
-					System.out.println("[TargetSelection] " + contour.size() + " points in contour");
+					System.out.println("[TargetSelection " + id + "] " + contour.size() + " points in contour");
 
 					// Draw marks at the center of gravity.
 					Imgproc.drawMarker(mat, new Point(cogX, cogY), new Scalar(255, 255, 255), Imgproc.MARKER_CROSS, 10,

@@ -1,42 +1,44 @@
 import org.opencv.core.Mat;
 
 /**
- * images
+ * images for merge process
  */
 public class Images
 {
-    Mat anImage;
-    boolean isFreshImage;
+    Mat mat = new Mat();
+    boolean isFreshImage = false;
 
-    Images()
-    {
-        isFreshImage = false;
-    }
-
-    public synchronized void setImage(Mat aImage)
+    public synchronized void setImage(Mat mat)
     {
         // System.out.println("setImage notifying");
-        anImage = aImage;
-        isFreshImage = true;
-       notify();
+        mat.copyTo(this.mat);
+        this.isFreshImage = true;
+        notify();
     }
 
     public synchronized Mat getImage()
     {
         // System.out.println("getImage");
-        if (!isFreshImage)
+        if (!this.isFreshImage)
         {
             // System.out.println("getImage wait for fresh image");
             try
-            {wait();}
-            catch (Exception e){System.out.println("[Images] error " + e);}
-        }        isFreshImage = false;
+            {
+                wait();
+            } catch (Exception e)
+            {
+                System.out.println("[Images] error " + e);
+            }
+        }
+        this.isFreshImage = false;
         // System.out.println("getImage done waiting - returning fresh Mat");
-        return anImage;
+        Mat returnMat = new Mat();
+        this.mat.copyTo(returnMat);
+        return returnMat;
     }
 
     public synchronized boolean isFreshImage()
     {
-        return isFreshImage;
+        return this.isFreshImage;
     }
 }

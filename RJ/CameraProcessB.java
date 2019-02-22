@@ -19,8 +19,8 @@ public class CameraProcessB implements Runnable
 	private String cameraName = "Elevator Camera";
 	private int cameraWidth = 320;
 	private int cameraHeight = 240;
-	public static PipelineProcessB pipelineProcessB;
-	public static Thread pipelineB;
+	private PipelineProcessB pipelineProcessB = new PipelineProcessB(this);
+	private Thread pipelineB;
 
 	// This object is used to capture frames from the camera.
 	// The captured image is stored to a Mat
@@ -29,7 +29,8 @@ public class CameraProcessB implements Runnable
 	// This object is used to store the camera frame returned from the inputStream
 	// Mats require a lot of memory. Placing this in a loop will cause an 'out of
 	// memory' error.
-	protected static CameraFrame cameraFrame = new CameraFrame(240, 320);
+	protected Mat cameraFrame = new Mat();
+	protected boolean isFreshImage = false;
 	private Mat cameraFrameTemp = new Mat(240, 320, CvType.CV_8UC3);
 
 	// This object is used to track the time of each iteration of the thread loop.
@@ -104,12 +105,15 @@ public class CameraProcessB implements Runnable
 
 		System.out.println("[CameraProcessB] Starting Elevator pipeline");
 
-		pipelineProcessB = new PipelineProcessB();
+		pipelineProcessB = new PipelineProcessB(this);
 		pipelineB = new Thread(pipelineProcessB, "4237ElevatorPipeline");
 		pipelineB.start();
-		try{
+		try
+		{
 			Thread.sleep(3000);
-		}catch(Exception e){}
+		} catch (Exception e)
+		{
+		}
 
 		this.setDebuggingEnabled(true);
 
@@ -137,8 +141,12 @@ public class CameraProcessB implements Runnable
 				cameraFrameTemp.setTo(new Scalar(100, 100, 100));
 			}
 
-			cameraFrame.setImage(cameraFrameTemp);
-
+			synchronized (this.cameraFrame)
+			{
+				cameraFrameTemp.copyTo(this.cameraFrame);
+				this.isFreshImage = true;
+				this.cameraFrame.notify();
+			}
 			loopCameraTime = timer.get() - loopCameraTime;
 
 			if (debuggingEnabled)

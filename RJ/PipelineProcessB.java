@@ -35,7 +35,7 @@ public class PipelineProcessB implements Runnable
 	// This object is used to call its process() method if a rarget is found in the
 	// new camera frame.
 	// The process() method must be created by the user.
-	private TargetSelection targetSelection = new TargetSelection();
+	private TargetSelection targetSelection = new TargetSelection("bumper");
 
 	// This object is used to store the current target data.
 	private TargetData currentTargetData = new TargetData();
@@ -69,6 +69,12 @@ public class PipelineProcessB implements Runnable
 	private String cameraName = "Elevator Camera";
 
 	private VideoSource camera;
+	private CameraProcessB cameraProcessB;
+
+	protected PipelineProcessB(CameraProcessB cameraProcessB)
+	{
+		this.cameraProcessB = cameraProcessB;
+	}
 
 	/**
 	 * This method sets the field to display debugging information.
@@ -178,7 +184,24 @@ public class PipelineProcessB implements Runnable
 			// Check if there was an error with the frame grab.
 			loopCameraTime = timer.get();
 
-			mat = CameraProcessB.cameraFrame.getImage();
+			synchronized (this.cameraProcessB.cameraFrame)
+			{
+				if (!this.cameraProcessB.isFreshImage)
+				{
+					try
+					{
+						this.cameraProcessB.cameraFrame.wait();
+					} catch (Exception e)
+					{
+						System.out.println("[CameraFrame] error " + e);
+					}
+				}
+				this.cameraProcessB.isFreshImage = false;
+				this.cameraProcessB.cameraFrame.copyTo(mat);
+			}
+
+			if (mat == null) // threads start at different times so skip problems expected at the beginning
+				continue;
 
 			loopCameraTime = timer.get() - loopCameraTime;
 			// else // if there was no error with the frame grab...
@@ -204,7 +227,7 @@ public class PipelineProcessB implements Runnable
 					}
 				}
 
-				Main.elevatorCamera.setImage(mat);
+				Main.obj.elevatorCamera.setImage(mat);
 
 				// Call the process() method that was created by the user to process the camera
 				// frame.
@@ -213,14 +236,14 @@ public class PipelineProcessB implements Runnable
 				loopTargetTime = timer.get() - loopTargetTime;
 			}
 
-			Main.elevatorPipeline.setImage(mat);
+			Main.obj.elevatorPipeline.setImage(mat);
 
 			// The synchronized set() method is ONLY called twice.
 			// (1) Here in the thread loop and (2) after the thread loop is terminated
 			// below.
-							loopTargetTime = timer.get();
-				targetSelection.process(mat, nextTargetData); // sets currentTargetData from nextTargetData
-				loopTargetTime = timer.get() - loopTargetTime;	
+			loopTargetTime = timer.get();
+			targetSelection.process(mat, nextTargetData); // sets currentTargetData from nextTargetData
+			loopTargetTime = timer.get() - loopTargetTime;
 
 			set(nextTargetData); // sets currentTargetData from nextTargetData
 
