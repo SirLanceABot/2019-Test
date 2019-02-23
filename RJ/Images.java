@@ -16,7 +16,7 @@ public class Images
         notify();
     }
 
-    public synchronized Mat getImage()
+    public synchronized void /*Mat*/ getImage(Mat mat)
     {
         // System.out.println("getImage");
         if (!this.isFreshImage)
@@ -32,9 +32,11 @@ public class Images
         }
         this.isFreshImage = false;
         // System.out.println("getImage done waiting - returning fresh Mat");
-        Mat returnMat = new Mat();
-        this.mat.copyTo(returnMat);
-        return returnMat;
+        // Mat returnMat = new Mat();
+        // this.mat.copyTo(returnMat);
+        // return returnMat;
+        this.mat.copyTo(mat);
+        return;
     }
 
     public synchronized boolean isFreshImage()

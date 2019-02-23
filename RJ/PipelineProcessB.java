@@ -184,22 +184,24 @@ public class PipelineProcessB implements Runnable
 			// Check if there was an error with the frame grab.
 			loopCameraTime = timer.get();
 
-			synchronized (this.cameraProcessB.cameraFrame)
-			{
-				if (!this.cameraProcessB.isFreshImage)
-				{
-					try
-					{
-						this.cameraProcessB.cameraFrame.wait();
-					} catch (Exception e)
-					{
-						System.out.println("[CameraFrame] error " + e);
-					}
-				}
-				this.cameraProcessB.isFreshImage = false;
-				this.cameraProcessB.cameraFrame.copyTo(mat);
-			}
+			// synchronized (this.cameraProcessB.cameraFrame)
+			// {
+			// 	if (!this.cameraProcessB.isFreshImage)
+			// 	{
+			// 		try
+			// 		{
+			// 			this.cameraProcessB.cameraFrame.wait();
+			// 		} catch (Exception e)
+			// 		{
+			// 			System.out.println("[CameraFrame] error " + e);
+			// 		}
+			// 	}
+			// 	this.cameraProcessB.isFreshImage = false;
+			// 	this.cameraProcessB.cameraFrame.copyTo(mat);
+			// }
 
+			//mat = this.cameraProcessB.cameraFrame.getImage();
+			this.cameraProcessB.cameraFrame.getImage(mat);
 			if (mat == null) // threads start at different times so skip problems expected at the beginning
 				continue;
 

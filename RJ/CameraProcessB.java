@@ -29,7 +29,8 @@ public class CameraProcessB implements Runnable
 	// This object is used to store the camera frame returned from the inputStream
 	// Mats require a lot of memory. Placing this in a loop will cause an 'out of
 	// memory' error.
-	protected Mat cameraFrame = new Mat();
+	//protected Mat cameraFrame = new Mat();
+	protected Images cameraFrame = new Images();
 	protected boolean isFreshImage = false;
 	private Mat cameraFrameTemp = new Mat(240, 320, CvType.CV_8UC3);
 
@@ -141,12 +142,13 @@ public class CameraProcessB implements Runnable
 				cameraFrameTemp.setTo(new Scalar(100, 100, 100));
 			}
 
-			synchronized (this.cameraFrame)
-			{
-				cameraFrameTemp.copyTo(this.cameraFrame);
-				this.isFreshImage = true;
-				this.cameraFrame.notify();
-			}
+			// synchronized (this.cameraFrame)
+			// {
+			// 	cameraFrameTemp.copyTo(this.cameraFrame);
+			// 	this.isFreshImage = true;
+			// 	this.cameraFrame.notify();
+			// }
+			this.cameraFrame.setImage(cameraFrameTemp);
 			loopCameraTime = timer.get() - loopCameraTime;
 
 			if (debuggingEnabled)
