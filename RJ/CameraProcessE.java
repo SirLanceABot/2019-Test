@@ -14,14 +14,14 @@ import edu.wpi.first.wpilibj.Timer;
  * @author FRC Team 4237
  * @version 2019.01.28.14.20
  */
-public class CameraProcessB implements Runnable
+public class CameraProcessE implements Runnable
 {
-	private static final String pId = new String("[CameraProcessB]");
+	private static final String pId = new String("[CameraProcessE]");
 
-	private String cameraName = "Bumper Camera";
-	private int cameraWidth = 160;
-	private int cameraHeight = 120;
-	private PipelineProcessB pipelineProcessB = new PipelineProcessB(this);
+	private String cameraName = "Elevator Camera";
+	private int cameraWidth = 320;
+	private int cameraHeight = 240;
+	private PipelineProcessE pipelineProcessE = new PipelineProcessE(this);
 	private Thread pipeline;
 
 	// This object is used to capture frames from the camera.
@@ -34,7 +34,7 @@ public class CameraProcessB implements Runnable
 	// protected Mat cameraFrame = new Mat();
 	protected Images cameraFrame = new Images();
 	protected boolean isFreshImage = false;
-	private Mat cameraFrameTemp = new Mat(120, 160, CvType.CV_8UC3);
+	private Mat cameraFrameTemp = new Mat(240, 320, CvType.CV_8UC3);
 
 	// This object is used to track the time of each iteration of the thread loop.
 	private Timer timer = new Timer();
@@ -48,7 +48,7 @@ public class CameraProcessB implements Runnable
 
 	private VideoSource camera;
 
-	public CameraProcessB(VideoSource camera)
+	public CameraProcessE(VideoSource camera)
 	{
 		this.camera = camera;
 	}
@@ -62,7 +62,7 @@ public class CameraProcessB implements Runnable
 	public void setDebuggingEnabled(boolean enabled)
 	{
 		debuggingEnabled = enabled;
-		pipelineProcessB.setDebuggingEnabled(enabled);
+		pipelineProcessE.setDebuggingEnabled(enabled);
 	}
 
 	/**
@@ -104,10 +104,10 @@ public class CameraProcessB implements Runnable
 		inputStream = new CvSink("cvsink");
 		inputStream.setSource(camera);
 
-		System.out.println(pId + " Starting Bumper pipeline");
+		System.out.println(pId + " Starting Elevator pipeline");
 
-		pipelineProcessB = new PipelineProcessB(this);
-		pipeline = new Thread(pipelineProcessB, "4237BumperPipeline");
+		pipelineProcessE = new PipelineProcessE(this);
+		pipeline = new Thread(pipelineProcessE, "4237ElevatorPipeline");
 		pipeline.start();
 		try
 		{
@@ -144,7 +144,7 @@ public class CameraProcessB implements Runnable
 			if (debuggingEnabled)
 			{
 				double loopTime = timer.get() - loopStartTime;
-				System.out.format("%s %6.2f FPS, loop/camera time %5.3f\n", pId, 1.0/loopTime, loopTime);
+				System.out.format("%s %6.2f FPS, loop/camera time %5.3f\n", pId, 1.0 / loopTime, loopTime);
 			}
 		} // End of the thread loop
 

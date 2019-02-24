@@ -1,3 +1,4 @@
+
 /*----------------------------------------------------------------------------*/
 /* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
@@ -16,14 +17,17 @@ import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 
 /**
- * This class is used to select the target from the camera frame. The user MUST MODIFY the process() method. The user
- * must create a new GripPipeline class using GRIP, modify the TargetData class, and modify this class.
+ * This class is used to select the target from the camera frame. The user MUST
+ * MODIFY the process() method. The user must create a new GripPipeline class
+ * using GRIP, modify the TargetData class, and modify this class.
  * 
  * @author FRC Team 4237
  * @version 2019.01.28.14.20
  */
 public class TargetSelection
 {
+	private static final String pId = new String("[TargetSelection]");
+
 	private String id;
 	// This object is used to run the GripPipeline
 	private GripPipelineYellowCube gripPipelineYellowCube = new GripPipelineYellowCube();
@@ -39,7 +43,8 @@ public class TargetSelection
 	/**
 	 * This method sets the field to display debugging information.
 	 * 
-	 * @param enabled Set to true to display debugging information.
+	 * @param enabled
+	 *                    Set to true to display debugging information.
 	 */
 	public void setDebuggingEnabled(boolean enabled)
 	{
@@ -47,17 +52,21 @@ public class TargetSelection
 	}
 
 	/**
-	 * This method is used to select the next target. The user MUST MODIFY this method.
+	 * This method is used to select the next target. The user MUST MODIFY this
+	 * method.
 	 * 
-	 * @param mat            The camera frame containing the image to process.
-	 * @param nextTargetData The target data found in the camera frame.
+	 * @param mat
+	 *                           The camera frame containing the image to process.
+	 * @param nextTargetData
+	 *                           The target data found in the camera frame.
 	 */
 	public void process(Mat mat, TargetData nextTargetData)
 	{
 		// Let the GripPipeline filter through the camera frame
 		gripPipelineYellowCube.process(mat);
 
-		// The GripPipeline creates an array of contours that must be searched to find the target.
+		// The GripPipeline creates an array of contours that must be searched to find
+		// the target.
 		ArrayList<MatOfPoint> filteredContours;
 		filteredContours = new ArrayList<MatOfPoint>(gripPipelineYellowCube.filterContoursOutput());
 
@@ -69,7 +78,7 @@ public class TargetSelection
 
 			if (debuggingEnabled)
 			{
-				System.out.println("[TargetSelection " + id + "] No Contours");
+				System.out.println(pId + " [" + id + "] No Contours");
 
 				// Display a message if no contours are found.
 				Imgproc.putText(mat, "No Contours", new Point(20, 20), Core.FONT_HERSHEY_SIMPLEX, 0.25,
@@ -84,14 +93,15 @@ public class TargetSelection
 
 			if (debuggingEnabled)
 			{
-				System.out.println("[TargetSelection " + id + "] " + filteredContours.size() + " contours");
+				System.out.println(pId + "[" + id + "] " + filteredContours.size() + " contours");
 
 				// Draw all contours at once (negative index).
 				// Positive thickness means not filled, negative thickness means filled.
 				Imgproc.drawContours(mat, filteredContours, -1, new Scalar(255, 255, 255), 2);
 			}
 
-			// These variables are used to put a bounding rectangle around the contour and then calculate the center of
+			// These variables are used to put a bounding rectangle around the contour and
+			// then calculate the center of
 			// gravity in the horizontal (x) and vertical (y) direction.
 			Rect boundRect;
 			int cogX;
@@ -119,7 +129,7 @@ public class TargetSelection
 
 				if (debuggingEnabled)
 				{
-					System.out.println("[TargetSelection " + id + "] " + contour.size() + " points in contour");
+					System.out.println(pId + " [" + id + "] " + contour.size() + " points in contour");
 
 					// Draw marks at the center of gravity.
 					Imgproc.drawMarker(mat, new Point(cogX, cogY), new Scalar(255, 255, 255), Imgproc.MARKER_CROSS, 10,

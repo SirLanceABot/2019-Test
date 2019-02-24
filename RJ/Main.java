@@ -83,6 +83,8 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 
 public class Main
 {
+    private static final String pId = new String("[Main]");
+
     private static String output(InputStream inputStream) throws IOException
     {
         StringBuilder sb = new StringBuilder();
@@ -113,12 +115,12 @@ public class Main
         public JsonElement streamConfig;
     }
 
-    private static CameraProcess cp;
     private static CameraProcessB cpB;
+    private static CameraProcessE cpE;
     private static ImageMerge imageDriver;
 
-    private static Thread visionThread;
     private static Thread visionThreadB;
+    private static Thread visionThreadE;
     private static Thread imageMergeThread;
 
     // TODO:
@@ -146,7 +148,7 @@ public class Main
      */
     public static void parseError(String str)
     {
-        System.err.println("config error in '" + configFile + "': " + str);
+        System.err.println(pId + " config error in '" + configFile + "': " + str);
     }
 
     /**
@@ -196,7 +198,7 @@ public class Main
             top = new JsonParser().parse(Files.newBufferedReader(Paths.get(configFile)));
         } catch (IOException ex)
         {
-            System.err.println("[main] could not open '" + configFile + "': " + ex);
+            System.err.println(pId + " could not open '" + configFile + "': " + ex + "\n");
             return false;
         }
 
@@ -259,7 +261,7 @@ public class Main
      */
     public static VideoSource startCamera(CameraConfig config)
     {
-        System.out.println("[main] " + config.name + " camera on USB path " + config.path);
+        System.out.println(pId + " " + config.name + " camera on USB path " + config.path);
 
         // this
         CameraServer inst = CameraServer.getInstance();
@@ -320,23 +322,23 @@ public class Main
         NetworkTableInstance ntinst = NetworkTableInstance.getDefault();
         if (server)
         {
-            System.out.println("[main] Setting up NetworkTables server");
+            System.out.println(pId + " Setting up NetworkTables server");
             ntinst.startServer();
         }
         else
         {
-            System.out.println("[main] Setting up NetworkTables client for team " + team);
+            System.out.println(pId + " Setting up NetworkTables client for team " + team);
             ntinst.startClientTeam(team);
         }
 
         // see if USB Flash Drive mounted and if so, log the images
         try
         {
-            System.out.println("[main] Parent sleeping 3 seconds so auto mount will be done by now, we are hopeful.");
+            System.out.println(pId + " Sleeping 3 seconds so auto mount will be done by now, we are hopeful.");
             Thread.sleep(3000);
         } catch (InterruptedException exc)
         {
-            System.out.println("[main] Sleep 3 seconds was interrupted");
+            System.out.println(pId + " Sleep 3 seconds was interrupted");
         }
 
         try
@@ -347,19 +349,19 @@ public class Main
             command.add("-c");
             command.add("mountpoint -q /mnt/usb ; echo $?");
 
-            System.out.println("[main] Run mountpoint /mnt/usb command");
+            System.out.println(pId + " Run mountpoint /mnt/usb command");
             ProcessBuilder pb1 = new ProcessBuilder(command);
             Process process1 = pb1.start();
             int errCode1 = process1.waitFor();
             command.clear();
-            System.out.println("[main] mountpoint command executed, any errors? " + (errCode1 == 0 ? "No" : "Yes"));
+            System.out.println(pId + " mountpoint command executed, any errors? " + (errCode1 == 0 ? "No" : "Yes"));
             String mountOutput = output(process1.getInputStream());
-            System.out.println("[main] mountpoint output:\n" + mountOutput);
-            System.out.println("[main] mountpoint errors:\n" + output(process1.getErrorStream()));
+            System.out.println(pId + " mountpoint output:\n" + mountOutput);
+            System.out.println(pId + " mountpoint errors:\n" + output(process1.getErrorStream()));
             logImage = mountOutput.startsWith("0");
             if (logImage)
             {
-                System.out.println("[main] Flash Drive Mounted /mnt/usb and image logging is on");
+                System.out.println(pId + " Flash Drive Mounted /mnt/usb and image logging is on");
                 // mkdir in case they don't exist. Don't bother checking for existance - just do
                 // it.
 
@@ -368,20 +370,20 @@ public class Main
                 command.add("sudo mkdir /mnt/usb/B /mnt/usb/BR /mnt/usb/E /mnt/usb/ER");
 
                 // execute command
-                System.out.println("[main] Run mkdir B BR E ER command");
+                System.out.println(pId + " Run mkdir B BR E ER command");
                 ProcessBuilder pb2 = new ProcessBuilder(command);
                 Process process2 = pb2.start();
                 int errCode2 = process2.waitFor();
-                System.out.println("[main] mkdir command executed, any errors? " + (errCode2 == 0 ? "No" : "Yes"));
-                System.out.println("[main] mkdir output:\n" + output(process2.getInputStream()));
-                System.out.println("[main] mkdir errors:\n" + output(process2.getErrorStream()));
+                System.out.println(pId + " mkdir command executed, any errors? " + (errCode2 == 0 ? "No" : "Yes"));
+                System.out.println(pId + " mkdir output:\n" + output(process2.getInputStream()));
+                System.out.println(pId + " mkdir errors:\n" + output(process2.getErrorStream()));
             }
             else
-                System.out.println("[main] No Flash Drive Mounted");
+                System.out.println(pId + " No Flash Drive Mounted");
 
         } catch (Exception ex2)
         {
-            System.out.println("[main] Error in mount process " + ex2);
+            System.out.println(pId + " Error in mount process " + ex2);
         }
 
         System.out.flush();
@@ -392,21 +394,21 @@ public class Main
 
             if (cameraConfig.name.equalsIgnoreCase("Bumper"))
             {
-                System.out.println("[main] Starting Bumper camera");
-                cp = new CameraProcess(startCamera(cameraConfig));
-                visionThread = new Thread(cp, "4237BumperCamera");
-                visionThread.start(); // start thread using the class' run() method (just saying run() won't start a
+                System.out.println(pId + " Starting Bumper camera");
+                cpB = new CameraProcessB(startCamera(cameraConfig));
+                visionThreadB = new Thread(cpB, "4237BumperCamera");
+                visionThreadB.start(); // start thread using the class' run() method (just saying run() won't start a
                 // thread - that just runs run() once)
             }
             else if (cameraConfig.name.equalsIgnoreCase("Elevator"))
             {
-                System.out.println("[main] Starting Elevator camera");
-                cpB = new CameraProcessB(startCamera(cameraConfig));
-                visionThreadB = new Thread(cpB, "4237ElevatorCamera");
-                visionThreadB.start();
+                System.out.println(pId + " Starting Elevator camera");
+                cpE = new CameraProcessE(startCamera(cameraConfig));
+                visionThreadE = new Thread(cpE, "4237ElevatorCamera");
+                visionThreadE.start();
             }
             else
-                System.out.println("[main] Unknown camera in cameraConfigs " + cameraConfig.name);
+                System.out.println(pId + " Unknown camera in cameraConfigs " + cameraConfig.name);
         }
 
         // start processed images merge and serve thread
@@ -423,7 +425,7 @@ public class Main
         imageMergeThread = new Thread(imageDriver, "4237ImageMerge");
         imageMergeThread.start();
 
-        // visionThread.setDaemon(true); // defines a sort of "background" task that
+        // visionThreadB.setDaemon(true); // defines a sort of "background" task that
         // just keeps running (until all the normal threads have terminated; must set
         // before the ".start"
 
@@ -432,7 +434,7 @@ public class Main
         {
             try
             {
-                // System.out.println("Parent sleeping 10 seconds");
+                // System.out.println(pId + " Parent sleeping 10 seconds");
                 Thread.sleep(10000);
             } catch (InterruptedException ex)
             {

@@ -18,6 +18,8 @@ import com.google.gson.Gson;
  */
 public class TargetData
 {
+    private static final String pId = new String("[TargetData]");
+
     // NOTE: No modifier means visible to both the class and package.
 
     // The user MUST MODIFY these following fields.
@@ -75,7 +77,7 @@ public class TargetData
         // DO NOT MODIFY these values.
         frameNumber++;
         isFreshData = true;
-     }
+    }
 
     /**
      * This method returns all of the target data.
@@ -194,7 +196,7 @@ public class TargetData
      */
     public String toString()
     {
-        return String.format("[TargetData] Frame = %d, cogX = %d, cogY = %d, width = %d, area = %d  %s", frameNumber,
-                cogX, cogY, width, area, isFreshData ? "FRESH" : "stale");
+        return String.format("Frame = %d, cogX = %d, cogY = %d, width = %d, area = %d  %s", frameNumber, cogX, cogY,
+                width, area, isFreshData ? "FRESH" : "stale");
     }
 }

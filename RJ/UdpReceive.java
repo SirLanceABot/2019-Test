@@ -17,6 +17,7 @@ import com.google.gson.Gson;
 
 public class UdpReceive implements Runnable
 {
+    private static final String pId = new String("[UdpReceive]");
 
     class TargetData
     {
@@ -26,7 +27,7 @@ public class UdpReceive implements Runnable
         int area; // Area of the rectangle
         boolean isTargetFound; // Was a target found?
         // --------------------------------------------------------------------------
-    
+
         // These fields are used to track the validity of the data.
         int frameNumber; // Number of the camera frame
         boolean isFreshData; // Is the data fresh?
@@ -34,15 +35,15 @@ public class UdpReceive implements Runnable
         public synchronized void fromJson(String message)
         {
             TargetData temp = new Gson().fromJson(message, TargetData.class);
-            System.out.println(temp);
+            // System.out.println(pId + " " + temp);
         }
 
         public String toString()
-    {
-        return String.format("[Received TargetData] Frame = %d, cogX = %d, cogY = %d, width = %d, area = %d  %s", frameNumber,
-                cogX, cogY, width, area, isFreshData ? "FRESH" : "stale");
-    }
-    
+        {
+            return String.format(pId + " target frame = %d, cogX = %d, cogY = %d, width = %d, area = %d  %s",
+                    frameNumber, cogX, cogY, width, area, isFreshData ? "FRESH" : "stale");
+        }
+
     }
 
     public static String lastDataReceived = "";
@@ -75,7 +76,7 @@ public class UdpReceive implements Runnable
 
     public void run()
     {
-        System.out.println("[UDPReceive] packet listener thread started");
+        System.out.println(pId + " packet listener thread started");
         byte[] buf = new byte[256];
         final int bufLength = buf.length; // save original length because length property is changed with usage
         DatagramPacket packet = new DatagramPacket(buf, bufLength);
@@ -89,32 +90,32 @@ public class UdpReceive implements Runnable
                 socket.receive(packet); // always receive the packets
                 byte[] data = packet.getData();
                 lastDataReceived = new String(data, 0, packet.getLength());
-                //System.out.println("UDP received >" + lastDataReceived + "<");
+                // System.out.println(pId + " >" + lastDataReceived + "<");
 
                 if (lastDataReceived.startsWith("Bumper "))
                 {
                     String message = new String(lastDataReceived.substring("Bumper ".length()));
                     TargetData receivedTarget = new TargetData();
-                    System.out.print("[UDPReceive] Bumper ");
+                    //System.out.print(pId + " Bumper ");
                     receivedTarget.fromJson(message);
-               }
+                }
 
                 else if (lastDataReceived.startsWith("Elevator "))
                 {
                     String message = new String(lastDataReceived.substring("Elevator ".length()));
                     TargetData receivedTargetB = new TargetData();
-                    System.out.print("[UDPReceive] Elevator ");
+                    //System.out.print(pId + " Elevator ");
                     receivedTargetB.fromJson(message);
                 }
 
                 else
                 {
-                    System.out.println("[UDPReceive] Unknown class received UDP " + lastDataReceived);
+                    System.out.println(pId + " Unknown class received UDP " + lastDataReceived);
                 }
             } catch (SocketTimeoutException e)
             {
                 // do something when no messages for awhile
-                System.out.println("[UDPReceive] hasn't heard from the vision pipeline for awhile");
+                System.out.println(pId + " hasn't heard from the vision pipeline for awhile");
             } catch (IOException e)
             {
                 e.printStackTrace();

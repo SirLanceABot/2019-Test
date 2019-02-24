@@ -5,36 +5,31 @@ import org.opencv.core.Mat;
  */
 public class Images
 {
+    private static final String pId = new String("[Images]");
+
     Mat mat = new Mat();
     boolean isFreshImage = false;
 
     public synchronized void setImage(Mat mat)
     {
-        // System.out.println("setImage notifying");
         mat.copyTo(this.mat);
         this.isFreshImage = true;
         notify();
     }
 
-    public synchronized void /*Mat*/ getImage(Mat mat)
+    public synchronized void getImage(Mat mat)
     {
-        // System.out.println("getImage");
         if (!this.isFreshImage)
         {
-            // System.out.println("getImage wait for fresh image");
             try
             {
                 wait();
             } catch (Exception e)
             {
-                System.out.println("[Images] error " + e);
+                System.out.println(pId + " error " + e);
             }
         }
         this.isFreshImage = false;
-        // System.out.println("getImage done waiting - returning fresh Mat");
-        // Mat returnMat = new Mat();
-        // this.mat.copyTo(returnMat);
-        // return returnMat;
         this.mat.copyTo(mat);
         return;
     }

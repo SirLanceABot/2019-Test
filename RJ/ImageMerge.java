@@ -10,13 +10,15 @@ import edu.wpi.first.cameraserver.CameraServer;
 
 public class ImageMerge implements Runnable
 {
+    private static final String pId = new String("[ImageMerge]");
+
     // This object is used to send the image to the Dashboard
     private CvSource outputStream;
 
     @Override
     public void run()
     {
-        System.out.println("[ImageMerge] Thread Started");
+        System.out.println(pId + " Thread Started");
 
         Mat ImageOverlay = new Mat(); // main image from elevator
         Mat ImageOutput = new Mat(); // main image from elevator + small bumper image inserted then weighted merge
@@ -40,22 +42,25 @@ public class ImageMerge implements Runnable
         {
             try
             {
-                // only get these images from Main once because they will wait for FRESH and the second get would be STALE
-                // Main.obj.elevatorPipeline.getImage().copyTo(ImageOverlay); // get the primary elevator image
-                // Main.obj.bumperPipeline.getImage().copyTo(insert); // get the insert bumper image
+                // only get these images from Main once because they will wait for FRESH and the
+                // second get would be STALE
+                // Main.obj.elevatorPipeline.getImage().copyTo(ImageOverlay); // get the primary
+                // elevator image
+                // Main.obj.bumperPipeline.getImage().copyTo(insert); // get the insert bumper
+                // image
                 Main.obj.elevatorPipeline.getImage(ImageOverlay); // get the primary elevator image
                 Main.obj.bumperPipeline.getImage(insert); // get the insert bumper image
 
                 if (ImageOverlay.dims() <= 1)
                 {
-                    System.out.println("ImageMerge] elevator too few dimensions");
+                    System.out.println(pId + " elevator too few dimensions");
                     insert.copyTo(ImageOutput);
                     Imgproc.putText(ImageOutput, "Bumper Contours Only", new Point(25, 30), Core.FONT_HERSHEY_SIMPLEX,
                             0.5, new Scalar(100, 100, 255), 1);
                 }
                 else if (insert.dims() <= 1)
                 {
-                    System.out.println("ImageMerge] bumper too few dimensions");
+                    System.out.println(pId + " bumper too few dimensions");
                     ImageOverlay.copyTo(ImageOutput);
                     Imgproc.putText(ImageOutput, "Elevator Contours Only", new Point(25, 30), Core.FONT_HERSHEY_SIMPLEX,
                             0.5, new Scalar(100, 100, 255), 1);
@@ -64,13 +69,14 @@ public class ImageMerge implements Runnable
                 {
                     // start with output image the elevator
                     ImageOverlay.copyTo(ImageOutput);
-  
+
                     // Scaling the insert smaller
                     // Imgproc.resize(insert, insertSmall, new Size(insert.rows() / 3, insert.rows()
                     // / 3), 0, 0, Imgproc.INTER_AREA);
                     Imgproc.resize(insert, insertSmall, new Size(), 0.6, 0.6, Imgproc.INTER_AREA);
 
                     // locate the small insert on the overlay
+                    // This assumes B is smaller than E.  If not, then opencv error in log from catch
                     int rowStart = ImageOutput.rows() - insertSmall.rows(); // for top/down put at bottom
                     int rowEnd = rowStart + insertSmall.rows();
                     int colStart = (ImageOutput.cols() - insertSmall.cols()) / 2; // for left/right align centers of the
@@ -96,7 +102,7 @@ public class ImageMerge implements Runnable
 
             } catch (Exception e)
             {
-                System.out.println("[ImageMerge] error " + e);
+                System.out.println(pId + " error " + e);
             }
         }
     }

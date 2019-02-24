@@ -16,6 +16,8 @@ import java.net.UnknownHostException;
 
 public class UdpSend
 {
+    private static final String pId = new String("[UdpSend");
+
     InetAddress address;
     byte[] UDPbuffer = new byte[256];
     final int bufLength = UDPbuffer.length; // save original length because length property is changed with usage

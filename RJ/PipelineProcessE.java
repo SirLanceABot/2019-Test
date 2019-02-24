@@ -22,14 +22,14 @@ import edu.wpi.first.wpilibj.Timer;
  * @author FRC Team 4237
  * @version 2019.01.28.14.20
  */
-public class PipelineProcessB implements Runnable
+public class PipelineProcessE implements Runnable
 {
-	private static final String pId = new String("[PipelineProcessB]");
+	private static final String pId = new String("[PipelineProcessE]");
 
 	// This object is used to call its process() method if a rarget is found in the
 	// new camera frame.
 	// The process() method must be created by the user.
-	private TargetSelection targetSelection = new TargetSelection("elevator");
+	private TargetSelection targetSelection = new TargetSelection("bumper");
 
 	// This object is used to store the current target data.
 	private TargetData currentTargetData = new TargetData();
@@ -47,7 +47,7 @@ public class PipelineProcessB implements Runnable
 	// This object is used to store the camera frame returned from the inputStream
 	// Mats require a lot of memory. Placing this in a loop will cause an 'out of
 	// memory' error.
-	private Mat mat = new Mat(120, 160, CvType.CV_8UC3);
+	private Mat mat = new Mat(240, 320, CvType.CV_8UC3);
 
 	// This object is used to track the time of each iteration of the thread loop.
 	private Timer timer = new Timer();
@@ -58,14 +58,14 @@ public class PipelineProcessB implements Runnable
 
 	// These fields are used to set the camera resolution and camera name.
 	// Use the set...() method to set these values.
-	private int cameraWidth = 160;
-	private int cameraHeight = 120;
-	private String cameraName = "Bumper Camera";
+	private int cameraWidth = 320;
+	private int cameraHeight = 240;
+	private String cameraName = "Elevator Camera";
 
 	private VideoSource camera;
-	private CameraProcessB cameraProcess;
+	private CameraProcessE cameraProcess;
 
-	protected PipelineProcessB(CameraProcessB cameraProcess)
+	protected PipelineProcessE(CameraProcessE cameraProcess)
 	{
 		this.cameraProcess = cameraProcess;
 	}
@@ -144,7 +144,7 @@ public class PipelineProcessB implements Runnable
 		inputStream = new CvSink("cvsink");
 		inputStream.setSource(camera);
 
-		outputStream = CameraServer.getInstance().putVideo("BumperContours", 160, 120);
+		outputStream = CameraServer.getInstance().putVideo("ElevatorContours", 320, 240);
 
 		// Reset and start the timer to time each iteration of the thread loop.
 		timer.reset();
@@ -178,12 +178,12 @@ public class PipelineProcessB implements Runnable
 			{
 				try
 				{
-					String filename = String.format("/mnt/usb/BR/%06d.jpg", currentTargetData.frameNumber);
+					String filename = String.format("/mnt/usb/ER/%06d.jpg", currentTargetData.frameNumber);
 					final File file = new File(filename);
 					filename = file.toString();
 					if (!Imgcodecs.imwrite(filename, mat))
 					{
-						System.out.println(pId + "Error writing BR");
+						System.out.println(pId + " Error writing ER");
 					}
 				} catch (Exception e)
 				{
@@ -191,7 +191,7 @@ public class PipelineProcessB implements Runnable
 				}
 			}
 
-			Main.obj.bumperCamera.setImage(mat);
+			Main.obj.elevatorCamera.setImage(mat);
 
 			// Call the process() method that was created by the user to process the camera
 			// frame.
@@ -199,25 +199,25 @@ public class PipelineProcessB implements Runnable
 			targetSelection.process(mat, nextTargetData); // sets currentTargetData from nextTargetData
 			loopTargetTime = timer.get() - loopTargetTime;
 
-			Main.obj.bumperPipeline.setImage(mat);
+			Main.obj.elevatorPipeline.setImage(mat);
 
 			// The synchronized set() method is ONLY called twice.
 			// (1) Here in the thread loop and (2) after the thread loop is terminated
 			// below.
 			set(nextTargetData); // sets currentTargetData from nextTargetData
 
-			Main.sendMessage.Communicate("Bumper " + currentTargetData.toJson());
+			Main.sendMessage.Communicate("Elevator " + currentTargetData.toJson());
 
 			if (Main.logImage)
 			{
 				try
 				{
-					String filename = String.format("/mnt/usb/B/%06d.jpg", currentTargetData.frameNumber);
+					String filename = String.format("/mnt/usb/E/%06d.jpg", currentTargetData.frameNumber);
 					final File file = new File(filename);
 					filename = file.toString();
 					if (!Imgcodecs.imwrite(filename, mat))
 					{
-						System.out.println(pId + " Error writing B");
+						System.out.println(pId + " Error writing E");
 					}
 				} catch (Exception e)
 				{
@@ -228,7 +228,7 @@ public class PipelineProcessB implements Runnable
 			if (debuggingEnabled)
 			{
 				// Display the camera frame in the output stream.
-				Imgproc.putText(mat, "Bumper Contours", new Point(25, 30), Core.FONT_HERSHEY_SIMPLEX, 0.5,
+				Imgproc.putText(mat, "Elevator Contours", new Point(25, 30), Core.FONT_HERSHEY_SIMPLEX, 0.5,
 						new Scalar(100, 100, 255), 1);
 				outputStream.putFrame(mat);
 			}
