@@ -16,7 +16,7 @@ import edu.wpi.first.wpilibj.Timer;
  */
 public class CameraProcessE implements Runnable
 {
-	private static final String pId = new String("[CameraProcessE]");
+	private static final String pId = new String("[ECameraProcess]");
 
 	private String cameraName = "Elevator Camera";
 	private int cameraWidth = 320;
@@ -104,17 +104,9 @@ public class CameraProcessE implements Runnable
 		inputStream = new CvSink("cvsink");
 		inputStream.setSource(camera);
 
-		System.out.println(pId + " Starting Elevator pipeline");
-
 		pipelineProcessE = new PipelineProcessE(this);
-		pipeline = new Thread(pipelineProcessE, "4237ElevatorPipeline");
+		pipeline = new Thread(pipelineProcessE, "4237Epipeline");
 		pipeline.start();
-		try
-		{
-			Thread.sleep(1000);
-		} catch (Exception e)
-		{
-		}
 
 		this.setDebuggingEnabled(true);
 

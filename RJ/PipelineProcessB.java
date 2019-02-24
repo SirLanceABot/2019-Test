@@ -24,12 +24,12 @@ import edu.wpi.first.wpilibj.Timer;
  */
 public class PipelineProcessB implements Runnable
 {
-	private static final String pId = new String("[PipelineProcessB]");
+	private static final String pId = new String("[BPipelineProcess]");
 
 	// This object is used to call its process() method if a rarget is found in the
 	// new camera frame.
 	// The process() method must be created by the user.
-	private TargetSelection targetSelection = new TargetSelection("elevator");
+	private TargetSelection targetSelection = new TargetSelection("bumper");
 
 	// This object is used to store the current target data.
 	private TargetData currentTargetData = new TargetData();
@@ -171,7 +171,8 @@ public class PipelineProcessB implements Runnable
 				continue;
 			}
 
-			// Scaling if needed to reduce ethernet load input must not be output
+			// Scaling if needed to reduce ethernet load might go here
+			// input mat must not be output mat
 			// Imgproc.resize(mat, differentmat, new Size(), 0.8, 0.8, Imgproc.INTER_AREA);
 
 			if (Main.logImage)
