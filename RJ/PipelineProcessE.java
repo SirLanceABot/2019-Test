@@ -49,9 +49,6 @@ public class PipelineProcessE implements Runnable
 	// memory' error.
 	private Mat mat = new Mat(240, 320, CvType.CV_8UC3);
 
-	// This object is used to track the time of each iteration of the thread loop.
-	private Timer timer = new Timer();
-
 	// This field is used to determine if debugging information should be displayed.
 	// Use the setDebuggingEnabled() method to set this value.
 	private boolean debuggingEnabled = true;
@@ -136,8 +133,9 @@ public class PipelineProcessE implements Runnable
 		this.setDebuggingEnabled(true);
 
 		// This variable will be used to time each iteration of the thread loop.
-		double loopStartTime = -999.0;
+		double loopTotalTime = -999.0;
 		double loopTargetTime = -999.0;
+		double loopWaitTime = -999.0;
 
 		// Set up the input stream to get frames from the camera.
 		// inputStream = CameraServer.getInstance().getVideo();
@@ -146,16 +144,12 @@ public class PipelineProcessE implements Runnable
 
 		outputStream = CameraServer.getInstance().putVideo("ElevatorContours", 320, 240);
 
-		// Reset and start the timer to time each iteration of the thread loop.
-		timer.reset();
-		timer.start();
-
 		// This is the thread loop. It can be stopped by calling the interrupt() method.
 		while (!Thread.interrupted())
 		{
 			if (debuggingEnabled)
 			{
-				loopStartTime = timer.get();
+				loopTotalTime = Timer.getFPGATimestamp();
 			}
 
 			// Reset the next target data
@@ -164,9 +158,9 @@ public class PipelineProcessE implements Runnable
 			// Tell the input stream to grab a frame from the camera and store it to the
 			// mat.
 			// Check if there was an error with the frame grab.
-			double startWait = Timer.getFPGATimestamp();
+			loopWaitTime = Timer.getFPGATimestamp();
 			this.cameraProcess.cameraFrame.getImage(mat);
-			System.out.println(pId + " wait " + (Timer.getFPGATimestamp()-startWait));
+			loopWaitTime = Timer.getFPGATimestamp() - loopWaitTime;
 			if (mat == null) // threads start at different times so skip problems expected at the beginning
 			{
 				System.out.println(pId + " Skipping null mat");
@@ -198,9 +192,9 @@ public class PipelineProcessE implements Runnable
 
 			// Call the process() method that was created by the user to process the camera
 			// frame.
-			loopTargetTime = timer.get();
+			loopTargetTime = Timer.getFPGATimestamp();
 			targetSelection.process(mat, nextTargetData); // sets currentTargetData from nextTargetData
-			loopTargetTime = timer.get() - loopTargetTime;
+			loopTargetTime = Timer.getFPGATimestamp() - loopTargetTime;
 
 			Main.obj.elevatorPipeline.setImage(mat);
 
@@ -238,9 +232,9 @@ public class PipelineProcessE implements Runnable
 
 			if (debuggingEnabled)
 			{
-				double loopTime = timer.get() - loopStartTime;
-				System.out.format("%s %6.2f FPS, loop time %5.3f, target time %5.3f\n", pId, 1.0/loopTime, loopTime,
-						loopTargetTime);
+				loopTotalTime = Timer.getFPGATimestamp() - loopTotalTime;
+				System.out.format("%s %6.2f FPS, loop time %5.3f, target time %5.3f, image wait time %5.3f\n", pId, 1.0/loopTotalTime,
+				 loopTotalTime,	loopTargetTime, loopWaitTime);
 			}
 		} // End of the thread loop
 

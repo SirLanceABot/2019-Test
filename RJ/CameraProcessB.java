@@ -36,9 +36,6 @@ public class CameraProcessB implements Runnable
 	protected boolean isFreshImage = false;
 	private Mat cameraFrameTemp = new Mat(120, 160, CvType.CV_8UC3);
 
-	// This object is used to track the time of each iteration of the thread loop.
-	private Timer timer = new Timer();
-
 	// This field is used to determine if debugging information should be displayed.
 	// Use the setDebuggingEnabled() method to set this value.
 	private boolean debuggingEnabled = true;
@@ -97,7 +94,7 @@ public class CameraProcessB implements Runnable
 	public void run()
 	{
 		// This variable will be used to time each iteration of the thread loop.
-		double loopStartTime = -999.0;
+		double loopTotalTime = -999.0;
 
 		// Set up the input stream to get frames from the camera.
 		// inputStream = CameraServer.getInstance().getVideo();
@@ -110,16 +107,12 @@ public class CameraProcessB implements Runnable
 
 		this.setDebuggingEnabled(true);
 
-		// Reset and start the timer to time each iteration of the thread loop.
-		timer.reset();
-		timer.start();
-
-		// This is the thread loop. It can be stopped by calling the interrupt() method.
+			// This is the thread loop. It can be stopped by calling the interrupt() method.
 		while (!Thread.interrupted())
 		{
 			if (debuggingEnabled)
 			{
-				loopStartTime = timer.get();
+				loopTotalTime = Timer.getFPGATimestamp();
 			}
 
 			// Tell the input stream to grab a frame from the camera and store it to the
@@ -135,8 +128,8 @@ public class CameraProcessB implements Runnable
 
 			if (debuggingEnabled)
 			{
-				double loopTime = timer.get() - loopStartTime;
-				System.out.format("%s %6.2f FPS, loop/camera time %5.3f\n", pId, 1.0/loopTime, loopTime);
+				loopTotalTime = Timer.getFPGATimestamp() - loopTotalTime;
+				System.out.format("%s %6.2f FPS, loop/camera time %5.3f\n", pId, 1.0/loopTotalTime, loopTotalTime);
 			}
 		} // End of the thread loop
 

@@ -129,7 +129,7 @@ public class TargetSelection
 
 				if (debuggingEnabled)
 				{
-					System.out.println(pId + " [" + id + "] " + contour.size() + " points in contour");
+					//System.out.println(pId + " [" + id + "] " + contour.size() + " points in contour");
 
 					// Draw marks at the center of gravity.
 					Imgproc.drawMarker(mat, new Point(cogX, cogY), new Scalar(255, 255, 255), Imgproc.MARKER_CROSS, 10,
