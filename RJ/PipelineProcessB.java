@@ -164,7 +164,9 @@ public class PipelineProcessB implements Runnable
 			// Tell the input stream to grab a frame from the camera and store it to the
 			// mat.
 			// Check if there was an error with the frame grab.
+			double startWait = Timer.getFPGATimestamp();
 			this.cameraProcess.cameraFrame.getImage(mat);
+			System.out.println(pId + " wait " + (Timer.getFPGATimestamp()-startWait));
 			if (mat == null) // threads start at different times so skip problems expected at the beginning
 			{
 				System.out.println(pId + " Skipping null mat");

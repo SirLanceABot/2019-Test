@@ -1,4 +1,5 @@
 import org.opencv.core.Mat;
+import edu.wpi.first.wpilibj.Timer;
 
 /**
  * images for merge process
@@ -24,7 +25,7 @@ public class Images
             try
             {
                 wait();
-            } catch (Exception e)
+         } catch (Exception e)
             {
                 System.out.println(pId + " error " + e);
             }

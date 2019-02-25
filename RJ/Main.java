@@ -411,19 +411,19 @@ public class Main
                 System.out.println(pId + " Unknown camera in cameraConfigs " + cameraConfig.name);
         }
 
-        // start processed images merge and serve thread
-        try
-        {
-            // Wait for other processes to make some images otherwise first time though gets
-            // an error
-            Thread.sleep(2000);
-        } catch (InterruptedException ex)
-        {
-        }
+        // // start processed images merge and serve thread
+        // try
+        // {
+        //     // Wait for other processes to make some images otherwise first time though gets
+        //     // an error
+        //     Thread.sleep(2000);
+        // } catch (InterruptedException ex)
+        // {
+        // }
 
-        imageDriver = new ImageMerge();
-        imageMergeThread = new Thread(imageDriver, "4237ImageMerge");
-        imageMergeThread.start();
+        // imageDriver = new ImageMerge();
+        // imageMergeThread = new Thread(imageDriver, "4237ImageMerge");
+        // imageMergeThread.start();
 
         // visionThreadB.setDaemon(true); // defines a sort of "background" task that
         // just keeps running (until all the normal threads have terminated; must set
