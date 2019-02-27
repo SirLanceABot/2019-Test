@@ -1,3 +1,6 @@
+import java.util.HashMap;
+import java.util.Map;
+
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
@@ -7,6 +10,8 @@ import org.opencv.imgproc.Imgproc;
 
 import edu.wpi.cscore.CvSource;
 import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 
 public class ImageMerge implements Runnable
 {
@@ -28,6 +33,24 @@ public class ImageMerge implements Runnable
         Mat insertSmall = new Mat(); // bumper image shrunk
 
         outputStream = CameraServer.getInstance().putVideo("MergedImages", 320, 240);
+
+        // Widget in Shuffleboard Tab
+		Map<String, Object> mapVideo = new HashMap<String, Object>();
+		mapVideo.put("Show crosshair", false);
+		mapVideo.put("Show controls", false);
+
+		synchronized(Main.obj.tabLock)
+		{
+		Main.obj.tab.add("ImageMerge", outputStream)
+		.withWidget(BuiltInWidgets.kCameraStream)
+		.withProperties(mapVideo)
+		//.withSize(12, 8)
+		//.withPosition(1, 2)
+		;
+
+		NetworkTableEntry fake = Main.obj.tab.add("fakeIM", "x").withSize(1, 1).withPosition(0, 0).getEntry();
+		//fake.setString("x");
+		}
 
         // CvSource outputStream = new CvSource("DriverView",
         // VideoMode.PixelFormat.kMJPEG, 320, 240, 30);

@@ -1,4 +1,6 @@
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
@@ -12,7 +14,11 @@ import edu.wpi.cscore.CvSink;
 import edu.wpi.cscore.CvSource;
 import edu.wpi.cscore.VideoSource;
 import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 
 /**
  * This class creates a camera thread to process camera frames. DO NOT MODIFY
@@ -143,6 +149,24 @@ public class PipelineProcessE implements Runnable
 		inputStream.setSource(camera);
 
 		outputStream = CameraServer.getInstance().putVideo("ElevatorContours", 320, 240);
+
+		// Widget in Shuffleboard Tab
+		Map<String, Object> mapVideo = new HashMap<String, Object>();
+		mapVideo.put("Show crosshair", false);
+		mapVideo.put("Show controls", false);
+
+		synchronized(Main.obj.tabLock)
+		{
+		Main.obj.tab.add("ElevatorContours", outputStream)
+		.withWidget(BuiltInWidgets.kCameraStream)
+		.withProperties(mapVideo)
+		//.withSize(12, 8)
+		//.withPosition(1, 2)
+		;
+
+		NetworkTableEntry fake = Main.obj.tab.add("fakeEC", "x").withSize(1, 1).withPosition(0, 0).getEntry();
+		//fakeEC.setString("x");
+		}
 
 		// This is the thread loop. It can be stopped by calling the interrupt() method.
 		while (!Thread.interrupted())

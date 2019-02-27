@@ -25,7 +25,9 @@ import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -41,9 +43,13 @@ import edu.wpi.cscore.UsbCamera;
 import edu.wpi.cscore.VideoSource;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.networktables.EntryListenerFlags;
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.vision.VisionPipeline;
 import edu.wpi.first.vision.VisionThread;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 
 import org.opencv.core.Mat;
 
@@ -149,6 +155,9 @@ public final class Main {
     Images bumperPipeline;
     Images elevatorCamera;
     Images elevatorPipeline;
+
+	ShuffleboardTab tab;
+    Object tabLock;
 
     static boolean logImage = false;
 
@@ -372,8 +381,8 @@ public final class Main {
         Main.obj.bumperPipeline = new Images();
         Main.obj.elevatorCamera = new Images();
         Main.obj.elevatorPipeline = new Images();
-
-        // start test UDP receiver since we don't have a roboRIO to test with - this
+        Main.obj.tabLock = new Object();
+       // start test UDP receiver since we don't have a roboRIO to test with - this
         // would go on the roboRIO not here on the RPi
         testUDPreceive = new UdpReceive(5800);
         UDPreceiveThread = new Thread(testUDPreceive, "4237UDPreceive");
@@ -389,6 +398,13 @@ public final class Main {
             ntinst.startClientTeam(team);
         }
 
+        synchronized(Main.obj.tabLock)
+        {
+        Main.obj.tab = Shuffleboard.getTab("Hybrid Mode");
+        Shuffleboard.selectTab("Hybrid Mode");
+        }
+
+ 
         // see if USB Flash Drive mounted and if so, log the images
         try
         {
@@ -451,7 +467,28 @@ public final class Main {
             if (config.name.equalsIgnoreCase("Bumper"))
             {
                 System.out.println(pId + " Starting Bumper camera");
-                cpB = new CameraProcessB(startCamera(config));
+                VideoSource Bcamera = startCamera(config);
+                ///////////////////
+                // Widget in Shuffleboard Tab
+                Map<String, Object> mapVideo = new HashMap<String, Object>();
+                mapVideo.put("Show crosshair", false);
+                mapVideo.put("Show controls", false);
+
+                synchronized(Main.obj.tabLock)
+                {
+                Main.obj.tab.add("Bumper", Bcamera)
+                .withWidget(BuiltInWidgets.kCameraStream)
+                .withProperties(mapVideo)
+                //.withSize(1, 1)
+                //.withPosition(0, 0)
+                ;
+
+                NetworkTableEntry fake = Main.obj.tab.add("fakeB", "x").withSize(1, 1).withPosition(0, 0).getEntry();
+
+                //fake.setString("x");
+                }
+                //////////////////
+                cpB = new CameraProcessB(Bcamera);
                 visionThreadB = new Thread(cpB, "4237BumperCamera");
                 visionThreadB.start(); // start thread using the class' run() method (just saying run() won't start a
                 // thread - that just runs run() once)
@@ -459,15 +496,35 @@ public final class Main {
             else if (config.name.equalsIgnoreCase("Elevator"))
             {
                 System.out.println(pId + " Starting Elevator camera");
-                cpE = new CameraProcessE(startCamera(config));
+                VideoSource Ecamera = startCamera(config);
+                 ///////////////////
+                // Widget in Shuffleboard Tab
+                Map<String, Object> mapVideo = new HashMap<String, Object>();
+                mapVideo.put("Show crosshair", false);
+                mapVideo.put("Show controls", false);
+
+                synchronized(Main.obj.tabLock)
+                {
+                Main.obj.tab.add("Elevator", Ecamera)
+                .withWidget(BuiltInWidgets.kCameraStream)
+                .withProperties(mapVideo)
+                //.withSize(12, 8)
+                //.withPosition(1, 2)
+                ;
+
+                NetworkTableEntry fake = Main.obj.tab.add("fakeE", "x").withSize(1, 1).withPosition(0, 0).getEntry();
+                //fake.setString("x");
+                }
+                //////////////////
+                cpE = new CameraProcessE(Ecamera);
                 visionThreadE = new Thread(cpE, "4237ElevatorCamera");
                 visionThreadE.start();
             }
             else
                 System.out.println(pId + " Unknown camera in cameraConfigs " + config.name);
         }
- 
-   // start switched cameras
+
+    // start switched cameras
     for (SwitchedCameraConfig config : switchedCameraConfigs) {
       startSwitchedCamera(config);
     }
