@@ -377,8 +377,8 @@ public final class Main {
         Main.obj.bumperPipeline = new Images();
         Main.obj.elevatorCamera = new Images();
         Main.obj.elevatorPipeline = new Images();
-        Main.obj.receivedTargetB= new TargetData();
-        Main.obj.receivedTargetE= new TargetData();
+        Main.obj.receivedTargetB = new TargetData();
+        Main.obj.receivedTargetE = new TargetData();
         System.out.println(pId + " Bumper " + Main.obj.receivedTargetB);
         System.out.println(pId + " Elevator " + Main.obj.receivedTargetE);
         Main.obj.tabLock = new Object();
