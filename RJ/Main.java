@@ -150,8 +150,6 @@ public final class Main {
     Images bumperPipeline;
     Images elevatorCamera;
     Images elevatorPipeline;
-    TargetData receivedTargetB;
-    TargetData receivedTargetE;
     ShuffleboardTab tab;
     Object tabLock;
 
@@ -377,11 +375,8 @@ public final class Main {
         Main.obj.bumperPipeline = new Images();
         Main.obj.elevatorCamera = new Images();
         Main.obj.elevatorPipeline = new Images();
-        Main.obj.receivedTargetB = new TargetData();
-        Main.obj.receivedTargetE = new TargetData();
-        System.out.println(pId + " Bumper " + Main.obj.receivedTargetB);
-        System.out.println(pId + " Elevator " + Main.obj.receivedTargetE);
         Main.obj.tabLock = new Object();
+        
         // start test UDP receiver since we don't have a roboRIO to test with - this
         // would go on the roboRIO not here on the RPi
         testUDPreceive = new UdpReceive(5800);

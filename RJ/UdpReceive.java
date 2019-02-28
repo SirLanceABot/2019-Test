@@ -13,38 +13,9 @@ import java.net.DatagramSocket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 
-import com.google.gson.Gson;
-
 public class UdpReceive implements Runnable
 {
     private static final String pId = new String("[UdpReceive]");
-
-    class TargetData
-    {
-        int cogX; // Horizontal (X) center of gravity of the rectangle
-        int cogY; // Vertical (Y) center of gravity of the rectangle
-        int width; // Width of the rectangle
-        int area; // Area of the rectangle
-        boolean isTargetFound; // Was a target found?
-        // --------------------------------------------------------------------------
-
-        // These fields are used to track the validity of the data.
-        int frameNumber; // Number of the camera frame
-        boolean isFreshData; // Is the data fresh?
-
-        public synchronized void fromJson(String message)
-        {
-            TargetData temp = new Gson().fromJson(message, TargetData.class);
-            // System.out.println(pId + " " + temp);
-        }
-
-        public String toString()
-        {
-            return String.format(pId + " target frame = %d, cogX = %d, cogY = %d, width = %d, area = %d  %s",
-                    frameNumber, cogX, cogY, width, area, isFreshData ? "FRESH" : "stale");
-        }
-
-    }
 
     public static String lastDataReceived = "";
     protected DatagramSocket socket = null;
@@ -95,13 +66,17 @@ public class UdpReceive implements Runnable
                 if (lastDataReceived.startsWith("Bumper "))
                 {
                     String message = new String(lastDataReceived.substring("Bumper ".length()));
-                    Main.obj.receivedTargetB.fromJson(message);
+                    TargetDataReceive receivedTargetB = new TargetDataReceive();
+                    receivedTargetB.fromJson(message);
+                    System.out.println(pId + " Bumper " + receivedTargetB);   
                 }
 
                 else if (lastDataReceived.startsWith("Elevator "))
                 {
                     String message = new String(lastDataReceived.substring("Elevator ".length()));
-                    Main.obj.receivedTargetE.fromJson(message);
+                    TargetDataReceive receivedTargetE = new TargetDataReceive();
+                    receivedTargetE.fromJson(message);
+                    System.out.println(pId + " Elevator " + receivedTargetE);   
                 }
 
                 else

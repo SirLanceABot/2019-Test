@@ -1,16 +1,16 @@
 import com.google.gson.Gson;
 
 /**
- * This class is used to store the target data. The user MUST MODIFY the
- * process() method. The user must create a new GripPipeline class using GRIP,
- * modify the TargetSelection class, and modify this class.
+ * This class is used to store the target data.
+ * 
+ * This is essentially identical to TargetData except the frame number comes from another source and is not generated herein.
  * 
  * @author FRC Team 4237
  * @version 2019.01.28.14.20
  */
-public class TargetData
+public class TargetDataReceive
 {
-    private static final String pId = new String("[TargetData]");
+    private static final String pId = new String("[TargetDataReceive]");
 
     // NOTE: No modifier means visible to both the class and package.
 
@@ -25,19 +25,19 @@ public class TargetData
     // --------------------------------------------------------------------------
 
     // These fields are used to track the validity of the data.
-    int frameNumber = 1; // Number of the camera frame
+    int frameNumber; // Number of the camera frame
     boolean isFreshData; // Is the data fresh?
 
     /**
      * Default contructor - resets all of the target data.
      */
-    public TargetData()
+    public TargetDataReceive()
     {
         reset();
     }
 
     /**
-     * This method resets all of the target data, except the frameNumber. The user
+     * This method resets all of the target data. The user
      * MUST MODIFY
      */
     void reset()
@@ -48,7 +48,7 @@ public class TargetData
         area = -1;
         isTargetFound = false;
 
-        // DO NOT reset the frameNumber
+        frameNumber = -1;
         isFreshData = true;
     }
 
@@ -58,7 +58,7 @@ public class TargetData
      * @param targetData
      *                       The new target data to store.
      */
-    void set(TargetData targetData)
+    void set(TargetDataReceive targetData)
     {
         cogX = targetData.cogX;
         cogY = targetData.cogY;
@@ -67,7 +67,7 @@ public class TargetData
         isTargetFound = targetData.isTargetFound;
 
         // DO NOT MODIFY these values.
-        frameNumber++;
+        frameNumber = targetData.frameNumber;
         isFreshData = true;
     }
 
@@ -76,9 +76,9 @@ public class TargetData
      * 
      * @return The target data.
      */
-    TargetData get()
+    public synchronized TargetDataReceive get()
     {
-        TargetData targetData = new TargetData();
+        TargetDataReceive targetData = new TargetDataReceive();
 
         targetData.cogX = cogX;
         targetData.cogY = cogY;
@@ -167,7 +167,13 @@ public class TargetData
         return isFreshData;
     }
 
-     public synchronized String toJson()
+    public synchronized void fromJson(String message)
+    {
+        TargetDataReceive temp = new Gson().fromJson(message, TargetDataReceive.class);
+        set(temp);
+    }
+
+    public synchronized String toJson()
     {
         Gson gson = new Gson(); // Or use new GsonBuilder().create();
         String json = gson.toJson(this); // serializes target to Json
