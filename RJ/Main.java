@@ -1,4 +1,3 @@
-
 /*
 RaspBerry Pi setup:
 
@@ -45,13 +44,9 @@ import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.networktables.EntryListenerFlags;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.vision.VisionPipeline;
-import edu.wpi.first.vision.VisionThread;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-
-import org.opencv.core.Mat;
 
 /*
    JSON format:
@@ -155,8 +150,9 @@ public final class Main {
     Images bumperPipeline;
     Images elevatorCamera;
     Images elevatorPipeline;
-
-	ShuffleboardTab tab;
+    TargetData receivedTargetB;
+    TargetData receivedTargetE;
+    ShuffleboardTab tab;
     Object tabLock;
 
     static boolean logImage = false;
@@ -381,8 +377,12 @@ public final class Main {
         Main.obj.bumperPipeline = new Images();
         Main.obj.elevatorCamera = new Images();
         Main.obj.elevatorPipeline = new Images();
+        Main.obj.receivedTargetB= new TargetData();
+        Main.obj.receivedTargetE= new TargetData();
+        System.out.println(pId + " Bumper " + Main.obj.receivedTargetB);
+        System.out.println(pId + " Elevator " + Main.obj.receivedTargetE);
         Main.obj.tabLock = new Object();
-       // start test UDP receiver since we don't have a roboRIO to test with - this
+        // start test UDP receiver since we don't have a roboRIO to test with - this
         // would go on the roboRIO not here on the RPi
         testUDPreceive = new UdpReceive(5800);
         UDPreceiveThread = new Thread(testUDPreceive, "4237UDPreceive");
@@ -403,7 +403,6 @@ public final class Main {
         Main.obj.tab = Shuffleboard.getTab("Hybrid Mode");
         Shuffleboard.selectTab("Hybrid Mode");
         }
-
  
         // see if USB Flash Drive mounted and if so, log the images
         try

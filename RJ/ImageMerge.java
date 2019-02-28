@@ -67,10 +67,6 @@ public class ImageMerge implements Runnable
             {
                 // only get these images from Main once because they will wait for FRESH and the
                 // second get would be STALE
-                // Main.obj.elevatorPipeline.getImage().copyTo(ImageOverlay); // get the primary
-                // elevator image
-                // Main.obj.bumperPipeline.getImage().copyTo(insert); // get the insert bumper
-                // image
                 Main.obj.elevatorPipeline.getImage(ImageOverlay); // get the primary elevator image
                 Main.obj.bumperPipeline.getImage(insert); // get the insert bumper image
 

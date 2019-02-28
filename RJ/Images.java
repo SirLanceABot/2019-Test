@@ -1,5 +1,4 @@
 import org.opencv.core.Mat;
-import edu.wpi.first.wpilibj.Timer;
 
 /**
  * images for merge process

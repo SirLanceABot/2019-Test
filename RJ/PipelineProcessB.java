@@ -18,8 +18,6 @@ import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.Timer;
 
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 
 /**
  * This class creates a camera thread to process camera frames. DO NOT MODIFY
@@ -183,9 +181,18 @@ public class PipelineProcessB implements Runnable
 			// Tell the input stream to grab a frame from the camera and store it to the
 			// mat.
 			// Check if there was an error with the frame grab.
-			loopWaitTime = Timer.getFPGATimestamp();
+			if (debuggingEnabled)
+			{
+				loopWaitTime = Timer.getFPGATimestamp();
+			}
+
 			this.cameraProcess.cameraFrame.getImage(mat);
-			loopWaitTime = Timer.getFPGATimestamp() - loopWaitTime;
+
+			if (debuggingEnabled)
+			{
+				loopWaitTime = Timer.getFPGATimestamp() - loopWaitTime;
+			}
+
 			if (mat == null) // threads start at different times so skip problems expected at the beginning
 			{
 				System.out.println(pId + " Skipping null mat");
@@ -217,9 +224,17 @@ public class PipelineProcessB implements Runnable
 
 			// Call the process() method that was created by the user to process the camera
 			// frame.
-			loopTargetTime = Timer.getFPGATimestamp();
+			if (debuggingEnabled)
+			{
+				loopTargetTime = Timer.getFPGATimestamp();
+			}
+
 			targetSelection.process(mat, nextTargetData); // sets currentTargetData from nextTargetData
-			loopTargetTime = Timer.getFPGATimestamp() - loopTargetTime;
+
+			if (debuggingEnabled)
+			{
+				loopTargetTime = Timer.getFPGATimestamp() - loopTargetTime;
+			}
 
 			Main.obj.bumperPipeline.setImage(mat);
 

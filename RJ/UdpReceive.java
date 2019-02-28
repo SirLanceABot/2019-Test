@@ -95,17 +95,13 @@ public class UdpReceive implements Runnable
                 if (lastDataReceived.startsWith("Bumper "))
                 {
                     String message = new String(lastDataReceived.substring("Bumper ".length()));
-                    TargetData receivedTarget = new TargetData();
-                    //System.out.print(pId + " Bumper ");
-                    receivedTarget.fromJson(message);
+                    Main.obj.receivedTargetB.fromJson(message);
                 }
 
                 else if (lastDataReceived.startsWith("Elevator "))
                 {
                     String message = new String(lastDataReceived.substring("Elevator ".length()));
-                    TargetData receivedTargetB = new TargetData();
-                    //System.out.print(pId + " Elevator ");
-                    receivedTargetB.fromJson(message);
+                    Main.obj.receivedTargetE.fromJson(message);
                 }
 
                 else
@@ -115,7 +111,7 @@ public class UdpReceive implements Runnable
             } catch (SocketTimeoutException e)
             {
                 // do something when no messages for awhile
-                System.out.println(pId + " hasn't heard from the vision pipeline for awhile");
+                System.out.println(pId + " hasn't heard from any vision pipeline for awhile");
             } catch (IOException e)
             {
                 e.printStackTrace();

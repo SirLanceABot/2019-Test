@@ -114,7 +114,7 @@ public class CameraProcessE implements Runnable
 			{
 				loopTotalTime = Timer.getFPGATimestamp();
 			}
-
+			
 			// Tell the input stream to grab a frame from the camera and store it to the
 			// mat.
 			// Check if there was an error with the frame grab.

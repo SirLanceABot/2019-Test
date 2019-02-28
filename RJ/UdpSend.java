@@ -28,7 +28,6 @@ public class UdpSend
 
     public UdpSend(int port)
     {
-
         try
         {
             // TODO: add code to variably specify where to send messages
@@ -67,7 +66,6 @@ public class UdpSend
 
     public synchronized void Communicate(String message)
     {
-
         UDPbuffer = message.getBytes();
 
         packet.setData(UDPbuffer, 0, UDPbuffer.length);
