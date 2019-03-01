@@ -174,8 +174,9 @@ public class PipelineProcessE implements Runnable
 				loopTotalTime = Timer.getFPGATimestamp();
 			}
 
-			// Reset the next target data
+			// Reset the next target data and bump up the frame number
 			nextTargetData.reset();
+			nextTargetData.incrFrameNumber();
 
 			// Tell the input stream to grab a frame from the camera and store it to the
 			// mat.
@@ -206,7 +207,7 @@ public class PipelineProcessE implements Runnable
 			{
 				try
 				{
-					String filename = String.format("/mnt/usb/ER/%06d.jpg", currentTargetData.frameNumber);
+					String filename = String.format("/mnt/usb/ER/%06d.jpg", nextTargetData.frameNumber);
 					final File file = new File(filename);
 					filename = file.toString();
 					if (!Imgcodecs.imwrite(filename, mat))

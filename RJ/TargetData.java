@@ -25,7 +25,7 @@ public class TargetData
     // --------------------------------------------------------------------------
 
     // These fields are used to track the validity of the data.
-    int frameNumber = 1; // Number of the camera frame
+    int frameNumber; // Number of the camera frame
     boolean isFreshData; // Is the data fresh?
 
     /**
@@ -34,6 +34,7 @@ public class TargetData
     public TargetData()
     {
         reset();
+        frameNumber = 0;
     }
 
     /**
@@ -65,10 +66,18 @@ public class TargetData
         width = targetData.width;
         area = targetData.area;
         isTargetFound = targetData.isTargetFound;
+        frameNumber = targetData.frameNumber;
 
-        // DO NOT MODIFY these values.
-        frameNumber++;
-        isFreshData = true;
+        // DO NOT MODIFY this value.
+         isFreshData = true;
+    }
+
+    /**
+     * This method increments the frame number of the target data.
+     */
+    void incrFrameNumber()
+    {
+            frameNumber++;
     }
 
     /**
@@ -165,6 +174,12 @@ public class TargetData
     public boolean isFreshData()
     {
         return isFreshData;
+    }
+
+    public synchronized void fromJson(String message)
+    {
+        TargetData temp = new Gson().fromJson(message, TargetData.class);
+        set(temp);
     }
 
      public synchronized String toJson()

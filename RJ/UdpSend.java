@@ -30,9 +30,11 @@ public class UdpSend
     {
         try
         {
-            // TODO: add code to variably specify where to send messages
+            // TODO: add code to variably specify where to send messages - it's hard-coded below for now
             // InetAddress address = InetAddress.getByAddress(IP);
-            address = InetAddress.getByName("127.0.0.1"); // "roborio-4237-frc.local"
+            // address = InetAddress.getByName("127.0.0.1"); // here
+            // address = InetAddress.getByName("roborio-4237-frc.local"); // there
+            address = InetAddress.getByName("0.0.0.0"); // anywhere
         } catch (UnknownHostException e)
         {
             e.printStackTrace();

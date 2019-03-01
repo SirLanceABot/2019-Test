@@ -1,11 +1,19 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+/*
+  UDP receive program
 
-// UDP receive program - test receiver instead of using the roboRIO
+ Usage:
+   Add this file or multiple files - or equivalents that actually route the messages to the right places - to the roboRIO
+   Start the thread or multiple threads if each thread processes its own messages
+   
+    private static UdpReceive testUDPreceive; // test UDP receiver in place of a roboRIO
+    private static Thread UDPreceiveThread; // remove these or at least don't start this thread if using the roboRIO
+
+    // start test UDP receiver
+    UDPreceive = new UdpReceive(5800); // port must match what the RPi is sending on
+    UDPreceiveThread = new Thread(UDPreceive, "4237UDPreceive");
+    UDPreceiveThread.start();
+
+*/
 
 import java.io.*;
 import java.net.DatagramPacket;
@@ -66,7 +74,7 @@ public class UdpReceive implements Runnable
                 if (lastDataReceived.startsWith("Bumper "))
                 {
                     String message = new String(lastDataReceived.substring("Bumper ".length()));
-                    TargetDataReceive receivedTargetB = new TargetDataReceive();
+                    TargetData receivedTargetB = new TargetData();
                     receivedTargetB.fromJson(message);
                     System.out.println(pId + " Bumper " + receivedTargetB);   
                 }
@@ -74,7 +82,7 @@ public class UdpReceive implements Runnable
                 else if (lastDataReceived.startsWith("Elevator "))
                 {
                     String message = new String(lastDataReceived.substring("Elevator ".length()));
-                    TargetDataReceive receivedTargetE = new TargetDataReceive();
+                    TargetData receivedTargetE = new TargetData();
                     receivedTargetE.fromJson(message);
                     System.out.println(pId + " Elevator " + receivedTargetE);   
                 }
