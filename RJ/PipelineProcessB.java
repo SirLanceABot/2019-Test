@@ -16,7 +16,6 @@ import edu.wpi.cscore.VideoSource;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.Timer;
-
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 
 /**
@@ -164,7 +163,7 @@ public class PipelineProcessB implements Runnable
 		;
 
 		NetworkTableEntry fake = Main.obj.tab.add("fakeBC", "x").withSize(1, 1).withPosition(0, 0).getEntry();
-		//fake.setString("x");
+		//fakeBC.setString("x");
 		}
 
 		// This is the thread loop. It can be stopped by calling the interrupt() method.
