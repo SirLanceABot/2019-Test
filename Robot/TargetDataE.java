@@ -39,7 +39,7 @@ public class TargetDataE
      * This method resets all of the target data, except the frameNumber. The user
      * MUST MODIFY
      */
-    synchronized void reset()
+    public synchronized void reset()
     {
         center = -1;
         distance = -1;
@@ -55,7 +55,7 @@ public class TargetDataE
      * @param targetData
      *                       The new target data to store.
      */
-    synchronized void set(TargetDataE targetData)
+    public synchronized void set(TargetDataE targetData)
     {
         center = targetData.center;
         distance = targetData.distance;
@@ -90,17 +90,17 @@ public class TargetDataE
     /**
      * This method increments the frame number of the target data.
      */
-    synchronized void incrFrameNumber()
+    public synchronized void incrFrameNumber()
     {
             frameNumber++;
     }
 
-    synchronized public double getCenter()
+    public synchronized double getCenter()
     {
         return center;
     }
 
-    synchronized public double getDistance()
+    public synchronized double getDistance()
     {
         return distance;
     }

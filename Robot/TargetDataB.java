@@ -42,7 +42,7 @@ public class TargetDataB
      * This method resets all of the target data, except the frameNumber. The user
      * MUST MODIFY
      */
-    synchronized void reset()
+    public synchronized void reset()
     {
         center.x = -1.0;
         center.y = -1.0;
@@ -62,7 +62,7 @@ public class TargetDataB
      * @param targetData
      *                       The new target data to store.
      */
-    synchronized void set(TargetDataB targetData)
+    public synchronized void set(TargetDataB targetData)
     {
         center.x = targetData.center.x;
         center.y = targetData.center.y;
@@ -108,27 +108,27 @@ public class TargetDataB
     /**
      * This method increments the frame number of the target data.
      */
-    synchronized void incrFrameNumber()
+    public synchronized void incrFrameNumber()
     {
             frameNumber++;
     }
 
-    synchronized public Point getCenter()
+    public synchronized public Point getCenter()
     {
         return center;
     }
 
-    synchronized public Size getSize()
+    public synchronized public Size getSize()
     {
         return size;
     }
 
-    synchronized public double getAngle()
+    public synchronized public double getAngle()
     {
         return angle;
     }
 
-    synchronized public double getFixedAngle()
+    public synchronized double getFixedAngle()
     {
         return fixedAngle;
     }
@@ -170,7 +170,7 @@ public class TargetDataB
         set(temp);
     }
 
-     public synchronized String toJson()
+    public synchronized String toJson()
     {
         Gson gson = new Gson(); // Or use new GsonBuilder().create();
         String json = gson.toJson(this); // serializes target to Json
