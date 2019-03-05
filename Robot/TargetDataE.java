@@ -17,17 +17,15 @@ public class TargetDataE
     // The user MUST MODIFY these following fields.
     // --------------------------------------------------------------------------
     // Target data of the bounding rectangle around the contour
-    int cogX; // Horizontal (X) center of gravity of the rectangle
-    int cogY; // Vertical (Y) center of gravity of the rectangle
-    int width; // Width of the rectangle
-    int area; // Area of the rectangle
-    boolean isTargetFound; // Was a target found?
+    double center;
+    double distance;
     // --------------------------------------------------------------------------
 
     // These fields are used to track the validity of the data.
     int frameNumber; // Number of the camera frame
     boolean isFreshData; // Is the data fresh?
-
+    boolean isTargetFound;
+    
     /**
      * Default contructor - resets all of the target data.
      */
@@ -43,10 +41,8 @@ public class TargetDataE
      */
     synchronized void reset()
     {
-        cogX = -1;
-        cogY = -1;
-        width = -1;
-        area = -1;
+        center = -1;
+        distance = -1;
         isTargetFound = false;
 
         // DO NOT reset the frameNumber
@@ -61,10 +57,8 @@ public class TargetDataE
      */
     synchronized void set(TargetDataE targetData)
     {
-        cogX = targetData.cogX;
-        cogY = targetData.cogY;
-        width = targetData.width;
-        area = targetData.area;
+        center = targetData.center;
+        distance = targetData.distance;
         isTargetFound = targetData.isTargetFound;
         frameNumber = targetData.frameNumber;
 
@@ -77,20 +71,18 @@ public class TargetDataE
      * 
      * @return The target data.
      */
-    synchronized TargetDataE get()
+    public synchronized TargetDataE get()
     {
-        TargetDataE targetData = new TargetDataE();
+       TargetDataE targetData = new TargetDataE();
 
-        targetData.cogX = cogX;
-        targetData.cogY = cogY;
-        targetData.width = width;
-        targetData.area = area;
-        targetData.isTargetFound = isTargetFound;
-        targetData.frameNumber = frameNumber;
-        targetData.isFreshData = isFreshData;
+       targetData.distance = distance;
+       targetData.center = center;
+       targetData.isTargetFound = isTargetFound;
+       targetData.frameNumber = frameNumber;
+       targetData.isFreshData = isFreshData;
 
-        // Indicate that the data is no longer fresh data.
-        isFreshData = false;
+       // Indicate that the data is no longer fresh data.
+       isFreshData = false;
 
         return targetData;
     }
@@ -103,56 +95,14 @@ public class TargetDataE
             frameNumber++;
     }
 
-     /**
-     * This method returns the horizontal(x) center of gravity of the bounding
-     * rectangle around the target.
-     * 
-     * @return The horizontal(x) center of gravity of the bounding rectangle.
-     */
-    public synchronized int getCogX()
+    synchronized public double getCenter()
     {
-        return cogX;
+        return center;
     }
 
-    /**
-     * This method returns the vertical(y) center of gravity of the bounding
-     * rectangle around the target.
-     * 
-     * @return The vertical(y) center of gravity of the bounding rectangle.
-     */
-    public synchronized int getCogY()
+    synchronized public double getDistance()
     {
-        return cogY;
-    }
-
-    /**
-     * This method returns the width of the bounding rectangle around the target.
-     * 
-     * @return The width of the bounding rectangle.
-     */
-    public synchronized int getWidth()
-    {
-        return width;
-    }
-
-    /**
-     * This method returns the area of the bounding rectangle around the target.
-     * 
-     * @return The area of the bounding rectangle.
-     */
-    public synchronized int getArea()
-    {
-        return area;
-    }
-
-    /**
-     * This method indicates if a target was found.
-     * 
-     * @return True if target is found. False if target is not found.
-     */
-    public synchronized boolean isTargetFound()
-    {
-        return isTargetFound;
+        return distance;
     }
 
     /**
@@ -196,8 +146,7 @@ public class TargetDataE
      */
     public synchronized String toString()
     {
-        return String.format("Frame = %d, %s, cogX = %d, cogY = %d, width = %d, area = %d  %s",
-            frameNumber, isTargetFound ? "target" : "no target",
-            cogX, cogY, width, area, isFreshData ? "FRESH" : "stale");
+        return String.format("Frame = %d, %s, center = %f, distance = %f, %s",
+            frameNumber, isTargetFound ? "target" : "no target", center, distance, isFreshData ? "FRESH" : "stale");
     }
 }
