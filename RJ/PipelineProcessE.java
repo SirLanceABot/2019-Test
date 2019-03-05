@@ -30,16 +30,16 @@ public class PipelineProcessE implements Runnable
 {
 	private static final String pId = new String("[EPipelineProcess]");
 
-	// This object is used to call its process() method if a rarget is found in the
+	// This object is used to call its process() method if a target is found in the
 	// new camera frame.
 	// The process() method must be created by the user.
-	private TargetSelection targetSelection = new TargetSelection("elevator");
+	private TargetSelectionE targetSelection = new TargetSelectionE();
 
 	// This object is used to store the current target data.
-	private TargetData currentTargetData = new TargetData();
+	private TargetDataE currentTargetData = new TargetDataE();
 
 	// This object is used to store the next target data.
-	private TargetData nextTargetData = new TargetData();
+	private TargetDataE nextTargetData = new TargetDataE();
 
 	// This object is used to capture frames from the camera.
 	// The captured image is stored to a Mat
@@ -118,9 +118,9 @@ public class PipelineProcessE implements Runnable
 	 * 
 	 * @return The target data set based on the GripPipeline and TargetSelection.
 	 */
-	public TargetData getTargetData()
+	public TargetDataE getTargetData()
 	{
-		TargetData targetData = new TargetData();
+		TargetDataE targetData = new TargetDataE();
 
 		targetData = get();
 
@@ -303,7 +303,7 @@ public class PipelineProcessE implements Runnable
 	 *                       A TargetData object containing the new target data to
 	 *                       store
 	 */
-	private synchronized void set(TargetData targetData)
+	private synchronized void set(TargetDataE targetData)
 	{
 		currentTargetData.set(targetData);
 	}
@@ -314,7 +314,7 @@ public class PipelineProcessE implements Runnable
 	 * 
 	 * @return A TargetData object containing the target data
 	 */
-	private synchronized TargetData get()
+	private synchronized TargetDataE get()
 	{
 		return currentTargetData.get();
 	}

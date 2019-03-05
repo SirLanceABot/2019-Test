@@ -74,7 +74,7 @@ public class UdpReceive implements Runnable
                 if (lastDataReceived.startsWith("Bumper "))
                 {
                     String message = new String(lastDataReceived.substring("Bumper ".length()));
-                    TargetData receivedTargetB = new TargetData();
+                    TargetDataB receivedTargetB = new TargetDataB();
                     receivedTargetB.fromJson(message);
                     System.out.println(pId + " Bumper " + receivedTargetB);   
                 }
@@ -82,7 +82,7 @@ public class UdpReceive implements Runnable
                 else if (lastDataReceived.startsWith("Elevator "))
                 {
                     String message = new String(lastDataReceived.substring("Elevator ".length()));
-                    TargetData receivedTargetE = new TargetData();
+                    TargetDataE receivedTargetE = new TargetDataE();
                     receivedTargetE.fromJson(message);
                     System.out.println(pId + " Elevator " + receivedTargetE);   
                 }
