@@ -290,10 +290,10 @@ public class Autonomous
         targetData = vision.getTargetData();
         if (targetData.isFreshData())
         {
-            VisionProcessB.rotate rotation = vision.getRotateDirection(targetData);
-            double rotationFactor = vision.getRotateFactor(targetData);
-            CameraProcess.strafeDirection strafeDirection = vision.getStrafeDirection(targetData);
-            double strafeDirectionFactor = vision.getStrafeFactor(targetData);
+            VisionProcessB.rotate rotation = vision.getRotateDirection(targetDataB);
+            double rotationFactor = vision.getRotateFactor(targetDataB);
+            CameraProcess.strafeDirection strafeDirection = vision.getStrafeDirection(targetDataB);
+            double strafeDirectionFactor = vision.getStrafeFactor(targetDataB);
 
             // rotate first then strafe
             if (rotation != rotate.kNone)

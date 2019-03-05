@@ -17,9 +17,9 @@ import frc.control.OperatorXbox;
 import frc.control.ButtonBoard;
 import frc.components.ElevatorAndArm;
 import frc.components.Lights;
-import frc.visionForWhiteTape.CameraProcessB;
+import frc.visionForWhiteTape.VisionProcessB;
 import frc.visionForWhiteTape.TargetDataB;
-import frc.visionForWhiteTape.CameraProcessB.rotate;
+import frc.visionForWhiteTape.VisionProcessB.rotate;
 
 import javax.lang.model.util.ElementScanner6;
 
@@ -41,7 +41,7 @@ public class Teleop
     private Arm arm = Arm.getInstance();
     private Elevator elevator = Elevator.getInstance();
     private ElevatorAndArm elevatorAndArm = ElevatorAndArm.getInstance();
-    private CameraProcessB vision = CameraProcessB.getInstance();
+    private VisionProcessB vision = VisionProcessB.getInstance();
 
     private DriverXbox driverXbox = DriverXbox.getInstance();
     private OperatorXbox operatorXbox = OperatorXbox.getInstance();
@@ -363,9 +363,9 @@ public class Teleop
         targetData = vision.getTargetData();
         if (targetData.isFreshData())
         {
-            CameraProcessB.rotate rotation = vision.getRotateDirection(targetData);
+            VisionProcessB.rotate rotation = vision.getRotateDirection(targetData);
             double rotationFactor = vision.getRotateFactor(targetData);
-            CameraProcessB.strafeDirection strafeDirection = vision.getStrafeDirection(targetData);
+            VisionProcessB.strafeDirection strafeDirection = vision.getStrafeDirection(targetData);
             double strafeDirectionFactor = vision.getStrafeFactor(targetData);
 
             // rotate first then strafe
@@ -373,7 +373,7 @@ public class Teleop
             {
                 drivetrain.driveCartesian(0.0, 0.0, Constants.ROTATION_SPEED * (rotationFactor / 90.0));
             }
-            else if (strafeDirection != CameraProcessB.strafeDirection.kNone)
+            else if (strafeDirection != VisionProcessB.strafeDirection.kNone)
             {
                 drivetrain.driveCartesian(0.0, Constants.STRAFE_SPEED * (strafeDirectionFactor / 80.0), 0.0);
             }
