@@ -13,6 +13,8 @@ import frc.robot.SlabShuffleboard.Recording;
 import frc.control.Xbox;
 import frc.control.Xbox.Constants;
 import frc.visionForWhiteTape.TargetDataB;
+import frc.visionForRetroReflectiveTape.TargetDataE;
+import frc.util.UdpReceive;
 
 import edu.wpi.first.wpilibj.Timer;
 
@@ -35,8 +37,12 @@ public class Robot extends TimedRobot
 
     private int shuffleboardPrintCounter = 0;
 
-	public static TargetDataB targetInfo = new TargetDataB();
+	public static TargetDataB targetInfoB = new TargetDataB();
+    public static TargetDataE targetInfoE = new TargetDataE();
 
+    private static UdpReceive UDPreceive; // get messages from the RPi
+    private static Thread UDPreceiveThread;
+    
     public Robot()
     {
         System.out.println(this.getClass().getName() + ": Started Constructing");
@@ -46,6 +52,10 @@ public class Robot extends TimedRobot
     @Override
     public void robotInit()
     {
+        UDPreceive = new UdpReceive(5800);
+        UDPreceiveThread = new Thread(UDPreceive, "4237UDPreceive");
+        UDPreceiveThread.start();
+  
         slabShuffleboard = SlabShuffleboard.getInstance();
 
         pregameSetupTabData = slabShuffleboard.getPregameSetupTabData();

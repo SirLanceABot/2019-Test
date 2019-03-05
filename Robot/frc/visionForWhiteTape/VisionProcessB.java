@@ -95,7 +95,7 @@ public class VisionProcessB
 
     public TargetDataB getTargetData()
     {
-        return Robot.targetInfo.get();
+        return Robot.targetInfoB.get();
     }
 
     // public int getHeightOfMask()
