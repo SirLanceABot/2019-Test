@@ -1,3 +1,5 @@
+package frc.visionForWhiteTape;
+
 import com.google.gson.Gson;
 import org.opencv.core.Point;
 import org.opencv.core.Size;
@@ -113,17 +115,17 @@ public class TargetDataB
             frameNumber++;
     }
 
-    public synchronized public Point getCenter()
+    public synchronized Point getCenter()
     {
         return center;
     }
 
-    public synchronized public Size getSize()
+    public synchronized Size getSize()
     {
         return size;
     }
 
-    public synchronized public double getAngle()
+    public synchronized double getAngle()
     {
         return angle;
     }
