@@ -1,0 +1,29 @@
+{
+    "cameras": [
+        {
+            "fps": 30,
+            "height": 240,
+            "name": "Elevator",
+            "path": "/dev/v4l/by-id/usb-KYE_Systems_Corp._USB_Camera_200901010001-video-index0",
+            "pixel format": "mjpeg",
+            "stream": {
+                "properties": []
+            },
+            "width": 320
+        },
+        {
+            "fps": 30,
+            "height": 120,
+            "name": "Bumper",
+            "path": "/dev/v4l/by-id/usb-Microsoft_Microsoft®_LifeCam_HD-3000-video-index0",
+            "pixel format": "mjpeg",
+            "stream": {
+                "properties": []
+            },
+            "width": 160
+        }
+    ],
+    "ntmode": "client",
+    "switched cameras": [],
+    "team": 4237
+}

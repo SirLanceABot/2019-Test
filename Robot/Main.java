@@ -1,15 +1,55 @@
 /*
+Note there are some settable parameters located at the SKULL in the right wide scroller
+
+A couple of changes to the standard example project:
+
+The changes from the standard example project are:
+
+The inclusion of the GSON in build.gradle
+
+dependencies {
+    compile 'com.google.code.gson:gson:2.8.5'
+
+Changes to and creation of the compile the project cmd file:
+
+RPiVisionCompile.cmd
+====
+
+To resolve the dependency in the build.gradle for:
+
+   compile 'com.google.code.gson:gson:2.8.5'
+
+Add those files to your maven repository.
+
+They are included in this project so just copy the folder 2.8.5 in this project to your maven probably located at:
+
+C:\Users\Public\frc2019\maven\com\google\code\gson\gson\
+
+You should then have a 2.2.4 folder and a 2.8.5 folder under gson
+
+====
+
 RaspBerry Pi setup:
 
-Format an SD card [SD Card Formatter]
-Download frcvision image
+Download frcvision image (from some WPI Github repository)
 Load image on SD card with balena Etcher [or others]
 Add auto mount of our camera image log USB flash drive to /etc/fstab
+
+# USB flash drive mounted for logging
+/dev/sda1	/mnt/usb	vfat	auto,users,rw,uid=1000,gid=100,umask=0002,nofail	0	0
+Copy of the file fstab is included in this project and can be used.
+
 Make camera image log directory mount point [mkdir /mnt/usb]
+
 Directories for the camera images on the flash drive are automatically made if the flash drive is inserted before our program runs
    [mkdir /mnt/usb/B; mkdir /mnt/usb/BR; mkdir /mnt/usb/E; mkdir /mnt/usb/ER]
-Configure cameras [browser frcvision.local/]
 
+Configure cameras [browser frcvision.local/]
+The configuration file is then saved in /boot/frc.json
+Copy of frc.json included in this project can be used for the Genius camera from ELevator and Microsoft HD-3000 camera for the bumper.
+
+Some of this project is based on the frc provided example thus:
+*/
 /*----------------------------------------------------------------------------*/
 /* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
@@ -150,11 +190,57 @@ public final class Main {
     Images bumperPipeline;
     Images elevatorCamera;
     Images elevatorPipeline;
-    ShuffleboardTab tab;
+    ShuffleboardTab cameraTab;
     Object tabLock;
 
-    static boolean logImage = false;
 
+
+
+// Settable parameters for some outputs listed below the skull
+
+
+     // _____________uu$$$$$$$$$$uu__________
+    // ___________uu$$$$$$$$$$$$$$$$uu__________
+    // _________u$$$$$$$$$$$$$$$$$$$$$u_________
+    // ________u$$$$$$$$$$$$$$$$$$$$$$$u________
+    // _______u$$$$$$$$$$$$$$$$$$$$$$$$$u_______
+    // _______u$$$$$$$$$$$$$$$$$$$$$$$$$u_______
+    // _______u$$$$$$"___"$$$"___"$$$$$$u________
+    // _______"$$$$"______u$u_______$$$$"________
+    // ________$$$———u$u_______u$$$________
+    // ________$$$u______u$$$u______u$$$________
+    // _________"$$$$uu$$$___$$$uu$$$$"_________
+    // __________"$$$$$$$"___"$$$$$$$"__________
+    // ____________u$$$$$$$u$$$$$$$u____________
+    // _____________u$"$"$"$"$"$"$u______________
+    // __uuu________$$u$_$_$_$_$u$$_______uuu__
+    // _u$$$$________$$$$$u$u$u$$$_______u$$$$_
+    // __$$$$$uu______"$$$$$$$$$"_____uu$$$$$$__
+    // u$$$$$$$$$$$uu____"""""____uuuu$$$$$$$$$$
+    // $$$$"""$$$$$$$$$$uuu___uu$$$$$$$$$"""$$$"
+    // _"""______""$$$$$$$$$$$uu_""$"""___________
+    // ___________uuuu_""$$$$$$$$$$uuu___________
+    // __u$$$uuu$$$$$$$$$uu_""$$$$$$$$$$$uuu$$$__
+    // __$$$$$$$$$$""""___________""$$$$$$$$$$$"__
+    // ___"$$$$$"______________________""$$$$""__
+
+
+
+// Settable parameters for some outputs listed below
+
+    static boolean runTestUDPreceiver = false;
+    static boolean runImageMerge = false;
+    static boolean debug = false;
+    static boolean displayBumperContours = true;
+    static boolean displayElevatorContours = true;
+// Shuffleboard display video streams commented out for contour images and merged images
+// No settable variables here for that
+// See the code to uncomment 
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+    static boolean logImage = false;
     public static int team;
     public static boolean server;
     public static List<CameraConfig> cameraConfigs = new ArrayList<>();
@@ -367,6 +453,7 @@ public final class Main {
 
         // read configuration
         if (!readConfig()) {
+            System.out.println(pId + " FATAL ERROR - could not read camera configuration file " + configFile);
             return;
         }
 
@@ -377,12 +464,15 @@ public final class Main {
         Main.obj.elevatorPipeline = new Images();
         Main.obj.tabLock = new Object();
         
-        // start test UDP receiver since we don't have a roboRIO to test with - this
-        // would go on the roboRIO not here on the RPi
-        testUDPreceive = new UdpReceive(5800);
-        UDPreceiveThread = new Thread(testUDPreceive, "4237UDPreceive");
-        UDPreceiveThread.start();
-
+        if(runTestUDPreceiver)
+            {
+            // start test UDP receiver since we don't have a roboRIO to test with
+            // this would go on the roboRIO not here on the RPi
+            testUDPreceive = new UdpReceive(5800);
+            UDPreceiveThread = new Thread(testUDPreceive, "4237UDPreceive");
+            UDPreceiveThread.start();
+            }
+            
         // start NetworkTables
         NetworkTableInstance ntinst = NetworkTableInstance.getDefault();
         if (server) {
@@ -393,10 +483,11 @@ public final class Main {
             ntinst.startClientTeam(team);
         }
 
+        // Create the Camera tab on the shuffleboard
         synchronized(Main.obj.tabLock)
         {
-        Main.obj.tab = Shuffleboard.getTab("Hybrid Mode");
-        Shuffleboard.selectTab("Hybrid Mode");
+        Main.obj.cameraTab = Shuffleboard.getTab("Camera");
+        Shuffleboard.selectTab("Camera");
         }
  
         // see if USB Flash Drive mounted and if so, log the images
@@ -464,21 +555,20 @@ public final class Main {
                 VideoSource Bcamera = startCamera(config);
                 ///////////////////
                 // Widget in Shuffleboard Tab
-                Map<String, Object> mapVideo = new HashMap<String, Object>();
-                mapVideo.put("Show crosshair", false);
-                mapVideo.put("Show controls", false);
-
+                Map<String, Object> mapBumperCamera = new HashMap<String, Object>();
+                mapBumperCamera.put("Show crosshair", false);
+                mapBumperCamera.put("Show controls", false);
+                
                 synchronized(Main.obj.tabLock)
                 {
-                Main.obj.tab.add("Bumper", Bcamera)
-                .withWidget(BuiltInWidgets.kCameraStream)
-                .withProperties(mapVideo)
-                //.withSize(1, 1)
-                //.withPosition(0, 0)
-                ;
+                Main.obj.cameraTab.add("Bumper Camera", Bcamera)
+                    .withWidget(BuiltInWidgets.kCameraStream)
+                    .withPosition(19, 0)
+                    .withSize(14, 15)
+                    .withProperties(mapBumperCamera)
+                    ;
 
-                NetworkTableEntry fake = Main.obj.tab.add("fakeB", "x").withSize(1, 1).withPosition(0, 0).getEntry();
-
+                NetworkTableEntry fake = Main.obj.cameraTab.add("fakeB", "x").withSize(1, 1).withPosition(0, 0).getEntry();
                 //fake.setString("x");
                 }
                 //////////////////
@@ -493,20 +583,20 @@ public final class Main {
                 VideoSource Ecamera = startCamera(config);
                  ///////////////////
                 // Widget in Shuffleboard Tab
-                Map<String, Object> mapVideo = new HashMap<String, Object>();
-                mapVideo.put("Show crosshair", false);
-                mapVideo.put("Show controls", false);
-
+                Map<String, Object> mapElevatorCamera = new HashMap<String, Object>();
+                mapElevatorCamera.put("Show crosshair", false);
+                mapElevatorCamera.put("Show controls", false);
+         
                 synchronized(Main.obj.tabLock)
                 {
-                Main.obj.tab.add("Elevator", Ecamera)
-                .withWidget(BuiltInWidgets.kCameraStream)
-                .withProperties(mapVideo)
-                //.withSize(12, 8)
-                //.withPosition(1, 2)
-                ;
-
-                NetworkTableEntry fake = Main.obj.tab.add("fakeE", "x").withSize(1, 1).withPosition(0, 0).getEntry();
+                Main.obj.cameraTab.add("Elevator Camera", Ecamera)
+                    .withWidget(BuiltInWidgets.kCameraStream)
+                    .withPosition(0, 0)
+                    .withSize(14, 15)
+                    .withProperties(mapElevatorCamera)
+                    ;
+        
+                NetworkTableEntry fake = Main.obj.cameraTab.add("fakeE", "x").withSize(1, 1).withPosition(0, 0).getEntry();
                 //fake.setString("x");
                 }
                 //////////////////
@@ -518,25 +608,28 @@ public final class Main {
                 System.out.println(pId + " Unknown camera in cameraConfigs " + config.name);
         }
 
-    // start switched cameras
-    for (SwitchedCameraConfig config : switchedCameraConfigs) {
-      startSwitchedCamera(config);
-    }
-
-        // start processed images merge and serve thread
-        try
-        {
-            // Wait for other processes to make some images otherwise first time though gets
-            // an error
-            Thread.sleep(2000);
-        } catch (InterruptedException ex)
-        {
+        // start switched cameras
+        for (SwitchedCameraConfig config : switchedCameraConfigs) {
+        startSwitchedCamera(config);
         }
 
-        imageDriver = new ImageMerge();
-        imageMergeThread = new Thread(imageDriver, "4237ImageMerge");
-        imageMergeThread.start();
+        if(runImageMerge)
+        {
+            // start processed images merge and serve thread
+            try
+            {
+                // Wait for other processes to make some images otherwise first time though gets
+                // an error
+                Thread.sleep(2000);
+            } catch (InterruptedException ex)
+            {
+            }
 
+            imageDriver = new ImageMerge();
+            imageMergeThread = new Thread(imageDriver, "4237ImageMerge");
+            imageMergeThread.start();
+        }
+        
         // visionThreadB.setDaemon(true); // defines a sort of "background" task that
         // just keeps running (until all the normal threads have terminated; must set
         // before the ".start"

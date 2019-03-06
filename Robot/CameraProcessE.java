@@ -31,14 +31,12 @@ public class CameraProcessE implements Runnable
 	// This object is used to store the camera frame returned from the inputStream
 	// Mats require a lot of memory. Placing this in a loop will cause an 'out of
 	// memory' error.
-	// protected Mat cameraFrame = new Mat();
 	protected Images cameraFrame = new Images();
-	protected boolean isFreshImage = false;
 	private Mat cameraFrameTemp = new Mat(240, 320, CvType.CV_8UC3);
 
 	// This field is used to determine if debugging information should be displayed.
 	// Use the setDebuggingEnabled() method to set this value.
-	private boolean debuggingEnabled = true;
+	private boolean debuggingEnabled = false;
 
 	// These fields are used to set the camera resolution and camera name.
 	// Use the set...() method to set these values.
@@ -105,7 +103,7 @@ public class CameraProcessE implements Runnable
 		pipeline = new Thread(pipelineProcessE, "4237Epipeline");
 		pipeline.start();
 
-		this.setDebuggingEnabled(true);
+        this.setDebuggingEnabled(Main.debug);
 
 		// This is the thread loop. It can be stopped by calling the interrupt() method.
 		while (!Thread.interrupted())
@@ -133,9 +131,6 @@ public class CameraProcessE implements Runnable
 			}
 		} // End of the thread loop
 
-		if (debuggingEnabled)
-		{
 			System.out.println(pId + " Camera Frame Grab Interrupted and Ended Thread");
-		}
 	}
 }

@@ -55,7 +55,7 @@ public class PipelineProcessB implements Runnable
 
 	// This field is used to determine if debugging information should be displayed.
 	// Use the setDebuggingEnabled() method to set this value.
-	private boolean debuggingEnabled = true;
+	private boolean debuggingEnabled = false;
 
 	// These fields are used to set the camera resolution and camera name.
 	// Use the set...() method to set these values.
@@ -134,7 +134,7 @@ public class PipelineProcessB implements Runnable
 	 */
 	public void run()
 	{
-		this.setDebuggingEnabled(true);
+        this.setDebuggingEnabled(Main.debug);
 
 		// This variable will be used to time each iteration of the thread loop.
 		double loopTotalTime = -999.0;
@@ -148,23 +148,25 @@ public class PipelineProcessB implements Runnable
 
 		outputStream = CameraServer.getInstance().putVideo("BumperContours", 160, 120);
 
-		// Widget in Shuffleboard Tab
-		Map<String, Object> mapVideo = new HashMap<String, Object>();
-		mapVideo.put("Show crosshair", false);
-		mapVideo.put("Show controls", false);
+        // //////////////////
+        // // Widget in Shuffleboard Tab
+		// Map<String, Object> mapVideo = new HashMap<String, Object>();
+		// mapVideo.put("Show crosshair", false);
+		// mapVideo.put("Show controls", false);
 
-		synchronized(Main.obj.tabLock)
-		{
-		Main.obj.tab.add("BumperContours", outputStream)
-		.withWidget(BuiltInWidgets.kCameraStream)
-		.withProperties(mapVideo)
-		//.withSize(12, 8)
-		//.withPosition(1, 2)
-		;
+		// synchronized(Main.obj.tabLock)
+		// {
+		// Main.obj.cameraTab.add("BumperContours", outputStream)
+		// .withWidget(BuiltInWidgets.kCameraStream)
+		// .withProperties(mapVideo)
+		// //.withSize(12, 8)
+		// //.withPosition(1, 2)
+		// ;
 
-		NetworkTableEntry fake = Main.obj.tab.add("fakeBC", "x").withSize(1, 1).withPosition(0, 0).getEntry();
-		//fakeBC.setString("x");
-		}
+		// NetworkTableEntry fake = Main.obj.cameraTab.add("fakeBC", "x").withSize(1, 1).withPosition(0, 0).getEntry();
+		// //fake.setString("x");
+		// }
+        // //////////////////
 
 		// This is the thread loop. It can be stopped by calling the interrupt() method.
 		while (!Thread.interrupted())
@@ -262,7 +264,7 @@ public class PipelineProcessB implements Runnable
 				}
 			}
 
-			if (debuggingEnabled)
+			if (Main.displayBumperContours)
 			{
 				// Display the camera frame in the output stream.
 				Imgproc.putText(mat, "Bumper Contours", new Point(25, 30), Core.FONT_HERSHEY_SIMPLEX, 0.5,
@@ -289,10 +291,7 @@ public class PipelineProcessB implements Runnable
 		// Free the mat memory.
 		mat.release();
 
-		if (debuggingEnabled)
-		{
 			System.out.println(pId + " Camera Frame Grab Interrupted and Ended Thread");
-		}
 	}
 
 	/**

@@ -20,11 +20,28 @@ public class ImageMerge implements Runnable
     // This object is used to send the image to the Dashboard
     private CvSource outputStream;
 
+   	// This field is used to determine if debugging information should be displayed.
+	// Use the setDebuggingEnabled() method to set this value.
+	private boolean debuggingEnabled = false;
+
+    /**
+	 * This method sets the field to display debugging information.
+	 * 
+	 * @param enabled
+	 *                    Set to true to display debugging information.
+	 */
+	public void setDebuggingEnabled(boolean enabled)
+	{
+		debuggingEnabled = enabled;
+	}
+
     @Override
     public void run()
     {
         System.out.println(pId + " Thread Started");
 
+        this.setDebuggingEnabled(Main.debug);
+        
         Mat ImageOverlay = new Mat(); // main image from elevator
         Mat ImageOutput = new Mat(); // main image from elevator + small bumper image inserted then weighted merge
                                      // and saved
@@ -34,33 +51,36 @@ public class ImageMerge implements Runnable
 
         outputStream = CameraServer.getInstance().putVideo("MergedImages", 320, 240);
 
-        // Widget in Shuffleboard Tab
-		Map<String, Object> mapVideo = new HashMap<String, Object>();
-		mapVideo.put("Show crosshair", false);
-		mapVideo.put("Show controls", false);
-
-		synchronized(Main.obj.tabLock)
-		{
-		Main.obj.tab.add("ImageMerge", outputStream)
-		.withWidget(BuiltInWidgets.kCameraStream)
-		.withProperties(mapVideo)
-		//.withSize(12, 8)
-		//.withPosition(1, 2)
-		;
-
-		NetworkTableEntry fake = Main.obj.tab.add("fakeIM", "x").withSize(1, 1).withPosition(0, 0).getEntry();
-		//fake.setString("x");
-		}
-
+        // starting the video stream could look like this but then it isn't shown by its "nice" name
+        // but we then do have control over the port used
         // CvSource outputStream = new CvSource("DriverView",
         // VideoMode.PixelFormat.kMJPEG, 320, 240, 30);
         // // CvSource cvsource = new CvSource("cvsource", VideoMode.PixelFormat.kMJPEG,
         // width, height, frames_per_sec);
-
         // MjpegServer mjpegServer = new MjpegServer("serve_DriverView", 1185);
-
         // mjpegServer.setSource(outputStream);
 
+        // //////////////////
+        // // uncomment all this to make a Shuffleboard widget for this video stream
+        // // Widget in Shuffleboard Tab
+		// Map<String, Object> mapVideo = new HashMap<String, Object>();
+		// mapVideo.put("Show crosshair", false);
+		// mapVideo.put("Show controls", false);
+        //
+		// synchronized(Main.obj.tabLock)
+		// {
+		// Main.obj.cameraTab.add("ImageMerge", outputStream)
+		// .withWidget(BuiltInWidgets.kCameraStream)
+		// .withProperties(mapVideo)
+		// //.withSize(12, 8)
+		// //.withPosition(1, 2)
+		// ;
+        //
+		// NetworkTableEntry fake = Main.obj.cameraTab.add("fakeIM", "x").withSize(1, 1).withPosition(0, 0).getEntry();
+		// //fake.setString("x");
+		// }
+        // //////////////////
+ 
         while (true)
         {
             try

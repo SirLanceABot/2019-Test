@@ -23,7 +23,6 @@ public class UdpSend
     final int bufLength = UDPbuffer.length; // save original length because length property is changed with usage
 
     DatagramPacket packet;
-    DatagramPacket packetReceive;
     DatagramSocket datagramSocket;
 
     public UdpSend(int port)
@@ -62,8 +61,6 @@ public class UdpSend
         }
 
         packet = new DatagramPacket(UDPbuffer, bufLength, address, port);
-
-        packetReceive = new DatagramPacket(UDPbuffer, bufLength, address, port);
     }
 
     public synchronized void Communicate(String message)
