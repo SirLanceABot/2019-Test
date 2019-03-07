@@ -562,8 +562,8 @@ public final class Main {
                 {
                 Main.obj.cameraTab.add("Bumper Camera", Bcamera)
                     .withWidget(BuiltInWidgets.kCameraStream)
-                    .withPosition(19, 0)
-                    .withSize(14, 15)
+                    .withPosition(20, 0)
+                    .withSize(13, 13)
                     .withProperties(mapBumperCamera)
                     ;
 
@@ -591,7 +591,7 @@ public final class Main {
                 Main.obj.cameraTab.add("Elevator Camera", Ecamera)
                     .withWidget(BuiltInWidgets.kCameraStream)
                     .withPosition(0, 0)
-                    .withSize(14, 15)
+                    .withSize(20, 17)
                     .withProperties(mapElevatorCamera)
                     ;
         
