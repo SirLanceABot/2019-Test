@@ -6,4 +6,6 @@ It's a work in progress and there is no coordination with changes being made to 
 
 The fstab file herein contains the line of code plus a comment to activate automount of the USB flash drive.  It is not recommended that this file or any other duplicate file of fstab be used on all images of RPi.  It is best to edit add the two lines to the existing fstab on a RPi SD card.  The fstab contains unique UUIDs that may be important to retain on a particular SD card.
 
+The folder 2.8.5 is GSON (Google SJON) used to format data to send between the RPi and roboRIO.  It should be installed in maven of any computer building code for the roboRIO along with adding it to the compile dependencies of the roboRIO build.gradle.
+
 --rkt 3/4/2019
