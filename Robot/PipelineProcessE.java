@@ -146,8 +146,11 @@ public class PipelineProcessE implements Runnable
 		inputStream = new CvSink("cvsink");
 		inputStream.setSource(camera);
 
-		outputStream = CameraServer.getInstance().putVideo("ElevatorContours", 320, 240);
-
+		if (Main.displayElevatorContours)
+		{
+			outputStream = CameraServer.getInstance().putVideo("ElevatorContours", 320, 240);
+		}
+		
         // //////////////////
         // // Widget in Shuffleboard Tab
 		// Map<String, Object> mapVideo = new HashMap<String, Object>();

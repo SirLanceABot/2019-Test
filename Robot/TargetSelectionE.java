@@ -149,7 +149,11 @@ public class TargetSelectionE
         {
             if(rBox.center.x > lBox.center.x)
             {
-                System.out.printf(pId + " Two pieces\tLeft: %.2f\tRight: %.2f\tReturn:%.2f\n", lBox.angle, rBox.angle,((((rBox.center.x + lBox.center.x)/ 2.0) - (mat.width() / 2)) / (mat.width() / 2)));
+                if (debuggingEnabled)
+                {
+                    System.out.printf(pId + " Two pieces\tLeft: %.2f\tRight: %.2f\tReturn:%.2f\n",
+                     lBox.angle, rBox.angle,((((rBox.center.x + lBox.center.x)/ 2.0) - (mat.width() / 2)) / (mat.width() / 2)));
+                }
                 centerTarget = ((((rBox.center.x + lBox.center.x)/ 2.0) - (mat.width() / 2)) / (mat.width() / 2));
 				distanceTarget = rBox.center.x - lBox.center.x;
 			}
@@ -157,27 +161,38 @@ public class TargetSelectionE
             {
                 if(lBox.size.area() > rBox.size.area())
                 {
-                    System.out.printf(pId + " Two pieces\tLeft: %.2f\n", lBox.angle);
+                    if (debuggingEnabled)
+                    {
+                        System.out.printf(pId + " Two pieces\tLeft: %.2f\n", lBox.angle);
+                    }
                     centerTarget = -1;
                 }
                 else
                 {
-                    System.out.printf(pId + " Two pieces\tRight: %.2f\n", rBox.angle);
+                    if (debuggingEnabled)
+                    {
+                        System.out.printf(pId + " Two pieces\tRight: %.2f\n", rBox.angle);
+                    }
                     centerTarget = 1;
                 }
             }
         }
         else if(rBox.size.area() > 0)
         {
-            System.out.printf(pId + " Right: %.2f\n", rBox.angle);
+            if (debuggingEnabled)
+			{
+                System.out.printf(pId + " Right: %.2f\n", rBox.angle);
+            }
             centerTarget = 1;
         }
         else if(lBox.size.area() > 0)
         {
-            System.out.printf(pId + " Left: %.2f\n", lBox.angle);
+            if (debuggingEnabled)
+			{
+                System.out.printf(pId + " Left: %.2f\n", lBox.angle);
+            }
             centerTarget = -1;
         }
-        
         else isTargetFoundLocal = false;
 
 		//Update the target

@@ -39,7 +39,7 @@ Add auto mount of our camera image log USB flash drive to /etc/fstab
 /dev/sda1	/mnt/usb	vfat	auto,users,rw,uid=1000,gid=100,umask=0002,nofail	0	0
 Copy of the file fstab is included in this project and can be used.
 
-Make camera image log directory mount point [mkdir /mnt/usb]
+Make camera image log directory mount point [sudo mkdir /mnt/usb]
 
 Directories for the camera images on the flash drive are automatically made if the flash drive is inserted before our program runs
    [mkdir /mnt/usb/B; mkdir /mnt/usb/BR; mkdir /mnt/usb/E; mkdir /mnt/usb/ER]
@@ -231,8 +231,8 @@ public final class Main {
     static boolean runTestUDPreceiver = false;
     static boolean runImageMerge = false;
     static boolean debug = false;
-    static boolean displayBumperContours = true;
-    static boolean displayElevatorContours = true;
+    static boolean displayBumperContours = false;
+    static boolean displayElevatorContours = false;
 // Shuffleboard display video streams commented out for contour images and merged images
 // No settable variables here for that
 // See the code to uncomment 
@@ -487,7 +487,6 @@ public final class Main {
         synchronized(Main.obj.tabLock)
         {
         Main.obj.cameraTab = Shuffleboard.getTab("Camera");
-        Shuffleboard.selectTab("Camera");
         }
  
         // see if USB Flash Drive mounted and if so, log the images
@@ -568,7 +567,7 @@ public final class Main {
                     .withProperties(mapBumperCamera)
                     ;
 
-                NetworkTableEntry fake = Main.obj.cameraTab.add("fakeB", "x").withSize(1, 1).withPosition(0, 0).getEntry();
+                NetworkTableEntry fake = Main.obj.cameraTab.add("fakeB", "x").withSize(2, 2).withPosition(1, 1).getEntry();
                 //fake.setString("x");
                 }
                 //////////////////
@@ -596,7 +595,7 @@ public final class Main {
                     .withProperties(mapElevatorCamera)
                     ;
         
-                NetworkTableEntry fake = Main.obj.cameraTab.add("fakeE", "x").withSize(1, 1).withPosition(0, 0).getEntry();
+                NetworkTableEntry fake = Main.obj.cameraTab.add("fakeE", "x").withSize(2, 2).withPosition(4, 4).getEntry();
                 //fake.setString("x");
                 }
                 //////////////////

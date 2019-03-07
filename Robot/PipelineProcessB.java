@@ -146,7 +146,10 @@ public class PipelineProcessB implements Runnable
 		inputStream = new CvSink("cvsink");
 		inputStream.setSource(camera);
 
-		outputStream = CameraServer.getInstance().putVideo("BumperContours", 160, 120);
+		if (Main.displayBumperContours)
+		{
+			outputStream = CameraServer.getInstance().putVideo("BumperContours", 160, 120);
+		}
 
         // //////////////////
         // // Widget in Shuffleboard Tab
