@@ -12,7 +12,7 @@
             "width": 320
         },
         {
-            "fps": 30,
+            "fps": 10,
             "height": 120,
             "name": "Bumper",
             "path": "/dev/v4l/by-id/usb-Microsoft_Microsoft®_LifeCam_HD-3000-video-index0",

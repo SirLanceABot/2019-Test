@@ -228,6 +228,7 @@ public final class Main {
 
 // Settable parameters for some outputs listed below
 
+    static String version = "1  3/7/2019";
     static boolean runTestUDPreceiver = false;
     static boolean runImageMerge = false;
     static boolean debug = false;
@@ -237,8 +238,6 @@ public final class Main {
 // No settable variables here for that
 // See the code to uncomment 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
 
     static boolean logImage = false;
     public static int team;
@@ -636,6 +635,7 @@ public final class Main {
         // loop forever
         for (;;) {
             try {
+                System.out.println(pId + " Program Version " + version + "  current time ms " + System.currentTimeMillis());
                 Thread.sleep(10000);
             } catch (InterruptedException ex) {
                 return;
