@@ -228,7 +228,7 @@ public final class Main {
 
 // Settable parameters for some outputs listed below
 
-    static String version = "1  3/7/2019";
+    static String version = "2  3/11/2019";
     static boolean runTestUDPreceiver = false;
     static boolean runImageMerge = false;
     static boolean debug = false;
