@@ -165,10 +165,9 @@ public class PipelineProcessE implements Runnable
 		// //.withSize(12, 8)
 		// //.withPosition(1, 2)
 		// ;
-
-		// NetworkTableEntry fake = Main.obj.cameraTab.add("fakeEC", "x").withSize(1, 1).withPosition(0, 0).getEntry();
-		// //fake.setString("x");
-		// }
+		//
+		// Shuffleboard.update();
+ 		// }
         // //////////////////
 
 		// This is the thread loop. It can be stopped by calling the interrupt() method.

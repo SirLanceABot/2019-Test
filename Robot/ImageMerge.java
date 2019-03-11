@@ -76,9 +76,8 @@ public class ImageMerge implements Runnable
 		// //.withPosition(1, 2)
 		// ;
         //
-		// NetworkTableEntry fake = Main.obj.cameraTab.add("fakeIM", "x").withSize(1, 1).withPosition(0, 0).getEntry();
-		// //fake.setString("x");
-		// }
+		// Shuffleboard.update();
+ 		// }
         // //////////////////
  
         while (true)

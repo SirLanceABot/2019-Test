@@ -556,7 +556,7 @@ public final class Main {
                 Map<String, Object> mapBumperCamera = new HashMap<String, Object>();
                 mapBumperCamera.put("Show crosshair", false);
                 mapBumperCamera.put("Show controls", false);
-                
+                   
                 synchronized(Main.obj.tabLock)
                 {
                 Main.obj.cameraTab.add("Bumper Camera", Bcamera)
@@ -565,9 +565,6 @@ public final class Main {
                     .withSize(13, 13)
                     .withProperties(mapBumperCamera)
                     ;
-
-                NetworkTableEntry fake = Main.obj.cameraTab.add("fakeB", "x").withSize(2, 2).withPosition(1, 1).getEntry();
-                //fake.setString("x");
                 }
                 //////////////////
                 cpB = new CameraProcessB(Bcamera);
@@ -584,7 +581,7 @@ public final class Main {
                 Map<String, Object> mapElevatorCamera = new HashMap<String, Object>();
                 mapElevatorCamera.put("Show crosshair", false);
                 mapElevatorCamera.put("Show controls", false);
-         
+          
                 synchronized(Main.obj.tabLock)
                 {
                 Main.obj.cameraTab.add("Elevator Camera", Ecamera)
@@ -593,9 +590,6 @@ public final class Main {
                     .withSize(20, 17)
                     .withProperties(mapElevatorCamera)
                     ;
-        
-                NetworkTableEntry fake = Main.obj.cameraTab.add("fakeE", "x").withSize(2, 2).withPosition(4, 4).getEntry();
-                //fake.setString("x");
                 }
                 //////////////////
                 cpE = new CameraProcessE(Ecamera);
@@ -605,7 +599,9 @@ public final class Main {
             else
                 System.out.println(pId + " Unknown camera in cameraConfigs " + config.name);
         }
-
+        
+        Shuffleboard.update();
+ 
         // start switched cameras
         for (SwitchedCameraConfig config : switchedCameraConfigs) {
         startSwitchedCamera(config);
