@@ -106,6 +106,16 @@ public class TargetDataE
     }
 
     /**
+     * This method indicates if a target was found.
+     * 
+     * @return True if target is found. False if target is not found.
+     */
+    public synchronized boolean isTargetFound()
+    {
+        return isTargetFound;
+    }
+
+    /**
      * This method returns the frame number of the image.
      * 
      * @return The frame number of the camera image, starting at 1 and incrementing

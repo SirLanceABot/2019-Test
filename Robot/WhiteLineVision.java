@@ -39,8 +39,15 @@ public class WhiteLineVision {
 	 * This is the primary method that runs the entire pipeline and updates the outputs.
 	 */
 	public void process(Mat source0) {
+
+		int tapeDistance = Main.obj.tapeDistance.get();
+		// System.out.println("Distance: " + tapeDistance);
 		// Step RGB_Threshold0:
 		Mat rgbThresholdInput = source0;
+		int maskHeight = 40;
+		// Mask off the top of the screen
+		Imgproc.rectangle(rgbThresholdInput, new Point(0.0, 0.0), new Point(rgbThresholdInput.cols(), maskHeight), new Scalar(0, 0, 0), -1);
+		
 		double[] rgbThresholdRed = {227.02338129496403, 255.0};
 		double[] rgbThresholdGreen = {243.07553956834528, 255.0};
 		double[] rgbThresholdBlue = {215.5575539568345, 255.0};

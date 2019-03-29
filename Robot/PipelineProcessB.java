@@ -269,7 +269,7 @@ public class PipelineProcessB implements Runnable
 			if (Main.displayBumperContours)
 			{
 				// Display the camera frame in the output stream.
-				Imgproc.putText(mat, "Bumper Contours", new Point(25, 30), Core.FONT_HERSHEY_SIMPLEX, 0.5,
+				Imgproc.putText(mat, "Bumper Contours", new Point(20, 30), Core.FONT_HERSHEY_SIMPLEX, 0.5,
 						new Scalar(100, 100, 255), 1);
 				outputStream.putFrame(mat);
 			}

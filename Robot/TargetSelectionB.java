@@ -66,6 +66,7 @@ public class TargetSelectionB
 	 */
      public void process(Mat mat, TargetDataB nextTargetData)
     {
+        //int tapeDistance = Main.obj.tapeDistance.get();
         RotatedRect boundRect;
 
         // // Mask off the top of the screen

@@ -56,16 +56,20 @@ public class TargetSelectionE
 	public void process(Mat mat, TargetDataE nextTargetData)
 	{
 		double centerTarget = 5;
-		double distanceTarget = -99999.;
+		int distanceTarget = Integer.MIN_VALUE;
+		// double centerBall;
 		boolean isTargetFoundLocal = true;
 		// Let the GripPipeline filter through the camera frame
 		gripPipeline.process(mat);
 
+		MatOfPoint2f contour1;
 		MatOfPoint2f contour2;
-        RotatedRect box;
+		RotatedRect box;
+		RotatedRect box2;
         RotatedRect lBox = new RotatedRect(new Point (0,0) ,new Size(0,0), 0);
         RotatedRect rBox = new RotatedRect(new Point (0,0) ,new Size(0,0), 0);
 		double angle;
+		
 		
 		// The GripPipeline creates an array of contours that must be searched to find
 		// the target.
@@ -95,7 +99,7 @@ public class TargetSelectionE
 				// Positive thickness means not filled, negative thickness means filled.
 				Imgproc.drawContours(mat, filteredContours, -1, new Scalar(255, 255, 255), 2);
 			}
-
+			Imgproc.drawContours(mat, filteredContours, -1, new Scalar(255, 0, 0), 1);
         for(MatOfPoint contour : filteredContours)
         {
             contour2 = new MatOfPoint2f(contour.toArray());
@@ -115,12 +119,12 @@ public class TargetSelectionE
             //     angle += 360;
             // }
             // if((angle < 20 && angle > 5) && (box.size.area() > lBox.size.area()))
-            if((angle >5 && angle < 80) && (box.size.area() > lBox.size.area()))
+            if((angle >5 && angle < 45) && (box.size.area() > lBox.size.area()))
             {
                 lBox = box;
                 lBox.angle = angle;
             }
-            else if((angle < 175 && angle > 100) && (box.size.area() > rBox.size.area()))
+            else if((angle < 175 && angle > 135) && (box.size.area() > rBox.size.area()))
             {
                 rBox = box;
                 rBox.angle = angle;
@@ -149,55 +153,76 @@ public class TargetSelectionE
         {
             if(rBox.center.x > lBox.center.x)
             {
-                if (debuggingEnabled)
+				if (debuggingEnabled)
                 {
                     System.out.printf(pId + " Two pieces\tLeft: %.2f\tRight: %.2f\tReturn:%.2f\n",
                      lBox.angle, rBox.angle,((((rBox.center.x + lBox.center.x)/ 2.0) - (mat.width() / 2)) / (mat.width() / 2)));
-                }
-                centerTarget = ((((rBox.center.x + lBox.center.x)/ 2.0) - (mat.width() / 2)) / (mat.width() / 2));
-				distanceTarget = rBox.center.x - lBox.center.x;
+				}                
+				centerTarget = ((((rBox.center.x + lBox.center.x)/ 2.0) - (mat.width() / 2)) / (mat.width() / 2));
+				distanceTarget = (int)(rBox.center.x - lBox.center.x);
 			}
             else
             {
                 if(lBox.size.area() > rBox.size.area())
                 {
-                    if (debuggingEnabled)
+					if (debuggingEnabled)
                     {
-                        System.out.printf(pId + " Two pieces\tLeft: %.2f\n", lBox.angle);
-                    }
-                    centerTarget = -1;
+                    	System.out.printf(pId + " Two pieces\tLeft: %.2f\n", lBox.angle);
+					}
+					centerTarget = -1;
                 }
                 else
                 {
-                    if (debuggingEnabled)
+					if (debuggingEnabled)
                     {
-                        System.out.printf(pId + " Two pieces\tRight: %.2f\n", rBox.angle);
-                    }
-                    centerTarget = 1;
+                    	System.out.printf(pId + " Two pieces\tRight: %.2f\n", rBox.angle);
+					}
+					centerTarget = 1;
                 }
             }
         }
         else if(rBox.size.area() > 0)
         {
-            if (debuggingEnabled)
-			{
-                System.out.printf(pId + " Right: %.2f\n", rBox.angle);
-            }
-            centerTarget = 1;
+			if (debuggingEnabled)
+            {
+            	System.out.printf(pId + " Right: %.2f\n", rBox.angle);
+			}
+			centerTarget = 1;
         }
         else if(lBox.size.area() > 0)
         {
-            if (debuggingEnabled)
-			{
-                System.out.printf(pId + " Left: %.2f\n", lBox.angle);
-            }
-            centerTarget = -1;
+			if (debuggingEnabled)
+            {
+            	System.out.printf(pId + " Left: %.2f\n", lBox.angle);
+			}
+			centerTarget = -1;
         }
-        else isTargetFoundLocal = false;
+		else if(filteredContours.size() >= 2)
+		{
+			contour2 = new MatOfPoint2f(filteredContours.get(1).toArray());
+			contour1 = new MatOfPoint2f(filteredContours.get(0).toArray());
+			box2 = org.opencv.imgproc.Imgproc.minAreaRect(contour2);
+			box = org.opencv.imgproc.Imgproc.minAreaRect(contour1);
+			if(Math.min(box.center.y, box2.center.y) / Math.max(box.center.y, box2.center.y) > .8)
+			{
+				centerTarget = ((((box2.center.x + box.center.x)/ 2.0) - (mat.width() / 2)) / (mat.width() / 2));
+				distanceTarget = (int)(Math.max(box.center.x,box2.center.x) - Math.min(box2.center.x,box.center.x));
+			}
+			else isTargetFoundLocal = false;
+		}
+		else isTargetFoundLocal = false;
 
 		//Update the target
 		nextTargetData.center = centerTarget;
+		// nextTargetData.ballCenter = Ball.find(mat);
 		nextTargetData.distance = distanceTarget;
+
+		if (debuggingEnabled)
+		{
+			System.out.println("Distance: " + distanceTarget);
+		}
+
+		Main.obj.tapeDistance.set(distanceTarget);
 		nextTargetData.isFreshData = true;
 		nextTargetData.isTargetFound = isTargetFoundLocal;
 	}

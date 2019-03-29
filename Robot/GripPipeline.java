@@ -45,9 +45,12 @@ public class GripPipeline {
 
 		// Step HSV_Threshold0:
 		Mat hsvThresholdInput = blurOutput;
-		double[] hsvThresholdHue = {43.70503597122302, 92.45733788395906};
-		double[] hsvThresholdSaturation = {119.24460431654677, 239.76962457337885};
-		double[] hsvThresholdValue = {100.89928057553956, 255};
+		// double[] hsvThresholdHue = {0,47};//{43.70503597122302, 92.45733788395906};
+		// double[] hsvThresholdSaturation = {0,40};//{119.24460431654677, 239.76962457337885};
+		// double[] hsvThresholdValue = {220,255};//{100.89928057553956, 255};
+		double[] hsvThresholdHue = {57,129};//{43.70503597122302, 92.45733788395906};
+		double[] hsvThresholdSaturation = {80,255};//{119.24460431654677, 239.76962457337885};
+		double[] hsvThresholdValue = {186,255};//{100.89928057553956, 255};
 		hsvThreshold(hsvThresholdInput, hsvThresholdHue, hsvThresholdSaturation, hsvThresholdValue, hsvThresholdOutput);
 
 		// Step Find_Contours0:
@@ -57,17 +60,17 @@ public class GripPipeline {
 
 		// Step Filter_Contours0:
 		ArrayList<MatOfPoint> filterContoursContours = findContoursOutput;
-		double filterContoursMinArea = 100.0;
+		double filterContoursMinArea = 6.0;//100
 		double filterContoursMinPerimeter = 0.0;
 		double filterContoursMinWidth = 0.0;
 		double filterContoursMaxWidth = 1000.0;
 		double filterContoursMinHeight = 0.0;
 		double filterContoursMaxHeight = 1000.0;
-		double[] filterContoursSolidity = {62.05035971223022, 100};
-		double filterContoursMaxVertices = 750.0;
+		double[] filterContoursSolidity = {0, 100};
+		double filterContoursMaxVertices = 1000000;
 		double filterContoursMinVertices = 0.0;
-		double filterContoursMinRatio = 0.1;
-		double filterContoursMaxRatio = 0.8;
+		double filterContoursMinRatio = 0.1;//.1
+		double filterContoursMaxRatio = 0.9;//.8
 		filterContours(filterContoursContours, filterContoursMinArea, filterContoursMinPerimeter, filterContoursMinWidth, filterContoursMaxWidth, filterContoursMinHeight, filterContoursMaxHeight, filterContoursSolidity, filterContoursMaxVertices, filterContoursMinVertices, filterContoursMinRatio, filterContoursMaxRatio, filterContoursOutput);
 
 	}
@@ -109,7 +112,8 @@ public class GripPipeline {
 	 * An indication of which type of filter to use for a blur.
 	 * Choices are BOX, GAUSSIAN, MEDIAN, and BILATERAL
 	 */
-	enum BlurType{
+	enum BlurType
+	{
 		BOX("Box Blur"), GAUSSIAN("Gaussian Blur"), MEDIAN("Median Filter"),
 			BILATERAL("Bilateral Filter");
 

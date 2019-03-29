@@ -67,6 +67,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -190,6 +191,7 @@ public final class Main {
     Images bumperPipeline;
     Images elevatorCamera;
     Images elevatorPipeline;
+    AtomicInteger tapeDistance;
     ShuffleboardTab cameraTab;
     Object tabLock;
 
@@ -228,7 +230,7 @@ public final class Main {
 
 // Settable parameters for some outputs listed below
 
-    static String version = "2  3/11/2019";
+    static String version = "5  3/20/2019";
     static boolean runTestUDPreceiver = false;
     static boolean runImageMerge = false;
     static boolean debug = false;
@@ -462,6 +464,7 @@ public final class Main {
         Main.obj.elevatorCamera = new Images();
         Main.obj.elevatorPipeline = new Images();
         Main.obj.tabLock = new Object();
+        Main.obj.tapeDistance = new AtomicInteger();
         
         if(runTestUDPreceiver)
             {
