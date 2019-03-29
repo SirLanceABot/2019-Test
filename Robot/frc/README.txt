@@ -8,6 +8,6 @@ Sorry but you'll have to manually compare this project with the latest 2019 deve
 
 
 See the Raspberry Pi vision project for instructions about adding
-GSON 2.8.5 to the build.gradle and your local maven repository to satisfy the use of GSON in teh roboRIO code.
+GSON 2.8.5 to the build.gradle and your local maven repository to satisfy the use of GSON in the roboRIO code.
 
-The instructions are the same for the RPi project and this roboRIO proejct.  But manually add a couple of lines to the roboRIO build.gradle.  That file is vastly different between the RPi and roboRIO.
+The instructions are the same for the RPi project and this roboRIO project.  But manually add a couple of lines to the roboRIO build.gradle.  That file is vastly different between the RPi and roboRIO.
