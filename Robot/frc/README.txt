@@ -1,6 +1,6 @@
 This folder - frc - are the files for the roboRIO project.
 
-Most of these files are for the robot from the 2019 develpoment project.  DO NOT overlay the officail project with these vision files.
+Most of these files are for the robot from the 2019 develpoment project.  DO NOT overlay the official project with these vision files.
 
 Some files are added or changed to use the vision data from the Raspberry Pi.
 
