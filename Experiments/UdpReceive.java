@@ -5,6 +5,8 @@
    Add this file or multiple files - or equivalents that actually route the messages to the right places - to the roboRIO
    Start the thread or multiple threads if each thread processes its own messages
    
+   In a RPi test environment with no roboRIO use the below 5 statements in Main.java
+   On the roboRIO use something similar in the right place (likely robot.java)
     private static UdpReceive testUDPreceive; // test UDP receiver in place of a roboRIO
     private static Thread UDPreceiveThread; // remove these or at least don't start this thread if using the roboRIO
 
@@ -69,7 +71,7 @@ public class UdpReceive implements Runnable
                 socket.receive(packet); // always receive the packets
                 byte[] data = packet.getData();
                 lastDataReceived = new String(data, 0, packet.getLength());
-                // System.out.println(pId + " >" + lastDataReceived + "<");
+                System.out.println(pId + " >" + lastDataReceived + "<");
 
                 if (lastDataReceived.startsWith("Bumper "))
                 {

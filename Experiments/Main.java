@@ -1,25 +1,29 @@
 /*
-Note there are some settable parameters located at the SKULL in the right wide scroller
+Note there are some settable parameters located at the SKULL in the right wide scroller.
 
-A couple of changes to the standard example project:
+A couple of changes to the FRCVision standard example project:
 
 The changes from the standard example project are:
 
 The inclusion of the GSON in build.gradle
 
-dependencies {
-    compile 'com.google.code.gson:gson:2.8.5'
-
 Changes to and creation of the compile the project cmd file:
 
 RPiVisionCompile.cmd
 ====
+Easiest resolution to including gson is:
+ in build.gradle add to dependencies {
+   compile name 'gson-2.8.5'
+ and add gson.jar or gson-2.8.5.jar to the project root folder since that path ('.') is
+ already in build.gradle.
 
-To resolve the dependency in the build.gradle for:
-
+ There are alternative essentially identical syntaxes.  Here's one of them:
    compile 'com.google.code.gson:gson:2.8.5'
 
-Add those files to your maven repository.
+ Another way to resolve the dependency in the build.gradle for:
+ 
+Add those files to your maven repository.  If you don't and are connected to the Internet
+they will automatically be included from the Maven respository.
 
 They are included in this project so just copy the folder 2.8.5 in this project to your maven probably located at:
 
@@ -47,6 +51,15 @@ Directories for the camera images on the flash drive are automatically made if t
 Configure cameras [browser frcvision.local/]
 The configuration file is then saved in /boot/frc.json
 Copy of frc.json included in this project can be used for the Genius camera from ELevator and Microsoft HD-3000 camera for the bumper.
+
+Program starts execution in Main.java - main.java
+
+Threads are spawned (optionally) for
+    UdpReceive (test receive data if no roboRIO)
+    CameraProcessB (bumper camera)
+    CameraProcessE (elevator camera)
+    ImageMerge (show picture in picture from the 2 cameras)
+--
 
 Some of this project is based on the frc provided example thus:
 */
@@ -181,7 +194,7 @@ public final class Main {
     // TODO:
     // all messages go to one UDP sender defined for one port but could have two
     // senders on different ports if that makes it easier to separate the messages
-    protected static UdpSend sendMessage = new UdpSend(5800);
+    protected static UdpSend sendMessage;
 
     private static UdpReceive testUDPreceive; // test UDP receiver in place of a roboRIO
     private static Thread UDPreceiveThread; // remove these or at least don't start this thread if using the roboRIO
@@ -194,9 +207,6 @@ public final class Main {
     AtomicInteger tapeDistance;
     ShuffleboardTab cameraTab;
     Object tabLock;
-
-
-
 
 // Settable parameters for some outputs listed below the skull
 
@@ -230,24 +240,30 @@ public final class Main {
 
 // Settable parameters for some outputs listed below
 
-    static String version = "rkt  3/28/2019";
+    static String version = "rkt  11/1/2019";
     static boolean runTestUDPreceiver = false;
-    static boolean runImageMerge = false;
+    static String UDPreceiverName = "rkt-laptop.local";
+    static boolean runImageMerge = true;
     static boolean debug = false;
     static boolean displayBumperContours = true;
-    static boolean displayElevatorContours = false;
+    static boolean displayElevatorContours = true;
+
 // Shuffleboard display video streams commented out for contour images and merged images
 // No settable variables here for that
 // See the code to uncomment 
+
+// "0.0.0.0" should be any computer but doesn't work for other computers - they don't see any packets
+// "roborio-4237-frc.local"
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
     static boolean logImage = false;
     public static int team;
     public static boolean server;
     public static List<CameraConfig> cameraConfigs = new ArrayList<>();
-  public static List<SwitchedCameraConfig> switchedCameraConfigs = new ArrayList<>();
-  public static List<VideoSource> cameras = new ArrayList<>();
-
+    public static List<SwitchedCameraConfig> switchedCameraConfigs = new ArrayList<>();
+    public static List<VideoSource> cameras = new ArrayList<>();
+ 
   private Main() {
   }
 
@@ -465,6 +481,8 @@ public final class Main {
         Main.obj.elevatorPipeline = new Images();
         Main.obj.tabLock = new Object();
         Main.obj.tapeDistance = new AtomicInteger();
+
+        sendMessage = new UdpSend(5800, UDPreceiverName);
         
         if(runTestUDPreceiver)
             {
@@ -635,6 +653,14 @@ public final class Main {
         for (;;) {
             try {
                 System.out.println(pId + " Program Version " + version + "  current time ms " + System.currentTimeMillis());
+
+                // Map<String, String> env = System.getenv(); // or get just one - String myEnv = System.getenv("env_name");
+                // for (String envName : env.keySet()) {
+                //     System.out.format("%s=%s%n",
+                //               envName,
+                //               env.get(envName));
+                // }
+
                 Thread.sleep(10000);
             } catch (InterruptedException ex) {
                 return;

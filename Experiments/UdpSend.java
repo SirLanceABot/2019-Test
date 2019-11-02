@@ -1,10 +1,3 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
-
 // UDP send program
 
 import java.io.IOException;
@@ -16,7 +9,7 @@ import java.net.UnknownHostException;
 
 public class UdpSend
 {
-    private static final String pId = new String("[UdpSend");
+    private static final String pId = new String("[UdpSend]");
 
     InetAddress address;
     byte[] UDPbuffer = new byte[256];
@@ -25,15 +18,19 @@ public class UdpSend
     DatagramPacket packet;
     DatagramSocket datagramSocket;
 
-    public UdpSend(int port)
+    public UdpSend(int port, String URL)
     {
         try
         {
-            // TODO: add code to variably specify where to send messages - it's hard-coded below for now
-            // InetAddress address = InetAddress.getByAddress(IP);
+            //address = InetAddress.getByName("rkt-laptop.local");
+            System.out.println("Sending UDP messages to >" + URL + "<");
+            address = InetAddress.getByName(URL);
+            //  public String UDPreceiver = "rkt-laptop.local"; // rkt laptop
+            // 0.0.0.0 doesn't work for other computers - they don't see any packets
+            // String UDPreceiver = "0.0.0.0"; // anywhere - wild card
             // address = InetAddress.getByName("127.0.0.1"); // here
             // address = InetAddress.getByName("roborio-4237-frc.local"); // there
-            address = InetAddress.getByName("0.0.0.0"); // anywhere
+
         } catch (UnknownHostException e)
         {
             e.printStackTrace();
@@ -42,7 +39,7 @@ public class UdpSend
         try
         {
             datagramSocket = new DatagramSocket();
-
+            datagramSocket.setBroadcast(true);
             // Setting the port address to reuse can sometimes help and I can't think of how
             // it would hurt us if we only have one process running on a port.
             // Especially if the socket isn't closed, it can take some time to free the port
@@ -71,7 +68,7 @@ public class UdpSend
 
         try
         {
-            datagramSocket.send(packet); // send requested speed to robot
+            datagramSocket.send(packet); // send target information to robot
         } catch (IOException e)
         {
             e.printStackTrace();

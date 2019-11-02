@@ -55,6 +55,8 @@ public class TargetSelectionE
 	 */
 	public void process(Mat mat, TargetDataE nextTargetData)
 	{
+		if(true) return; // bailout now without running anything
+		
 		double centerTarget = 5;
 		int distanceTarget = Integer.MIN_VALUE;
 		boolean isTargetFoundLocal = true;
