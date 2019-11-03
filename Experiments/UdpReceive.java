@@ -29,12 +29,9 @@ public class UdpReceive implements Runnable
 
     public static String lastDataReceived = "";
     protected DatagramSocket socket = null;
-    protected BufferedReader in = null;
-    protected boolean moreQuotes = true;
 
     public UdpReceive(int port)
     {
-        // super(name);
         try
         {
             socket = new DatagramSocket(port);

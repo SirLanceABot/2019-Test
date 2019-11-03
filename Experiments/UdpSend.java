@@ -22,16 +22,9 @@ public class UdpSend
     {
         try
         {
-            //address = InetAddress.getByName("rkt-laptop.local");
             System.out.println("Sending UDP messages to >" + URL + "<");
             address = InetAddress.getByName(URL);
-            //  public String UDPreceiver = "rkt-laptop.local"; // rkt laptop
-            // 0.0.0.0 doesn't work for other computers - they don't see any packets
-            // String UDPreceiver = "0.0.0.0"; // anywhere - wild card
-            // address = InetAddress.getByName("127.0.0.1"); // here
-            // address = InetAddress.getByName("roborio-4237-frc.local"); // there
-
-        } catch (UnknownHostException e)
+         } catch (UnknownHostException e)
         {
             e.printStackTrace();
         }

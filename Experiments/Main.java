@@ -240,9 +240,12 @@ public final class Main {
 
 // Settable parameters for some outputs listed below
 
-    static String version = "rkt  11/1/2019";
+    static String version = "rkt  11/3/2019";
     static boolean runTestUDPreceiver = false;
     static String UDPreceiverName = "rkt-laptop.local";
+    //static String UDPreceiverName = "0.0.0.0";
+    // "0.0.0.0" should be any computer but doesn't work for other computers - they don't see any packets
+    // "roborio-4237-frc.local"
     static boolean runImageMerge = true;
     static boolean debug = false;
     static boolean displayBumperContours = true;
@@ -251,10 +254,6 @@ public final class Main {
 // Shuffleboard display video streams commented out for contour images and merged images
 // No settable variables here for that
 // See the code to uncomment 
-
-// "0.0.0.0" should be any computer but doesn't work for other computers - they don't see any packets
-// "roborio-4237-frc.local"
-
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
     static boolean logImage = false;
