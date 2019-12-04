@@ -1,6 +1,6 @@
 Align robot to the floor white tape
 
-Run once and robot rotated wildly.  Never run again but good model to start a future Java vision.
+Run once and robot rotated wildly.  Never ran again but good model to start a future Java vision.
 
 The roboRIO project to drive to the camera image:
 2019 White Line Vision-Using Rects
