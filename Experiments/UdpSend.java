@@ -22,7 +22,7 @@ public class UdpSend
     {
         try
         {
-            System.out.println("Sending UDP messages to >" + URL + "<");
+            System.out.println(pId + " Sending UDP messages to " + URL + ":" + port);
             address = InetAddress.getByName(URL);
          } catch (UnknownHostException e)
         {
@@ -62,6 +62,7 @@ public class UdpSend
         try
         {
             datagramSocket.send(packet); // send target information to robot
+
         } catch (IOException e)
         {
             e.printStackTrace();

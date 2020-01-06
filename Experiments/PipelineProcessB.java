@@ -134,7 +134,9 @@ public class PipelineProcessB implements Runnable
 	 */
 	public void run()
 	{
-        this.setDebuggingEnabled(Main.debug);
+		System.out.println(pId + " Starting run");
+
+		this.setDebuggingEnabled(Main.debug);
 
 		// This variable will be used to time each iteration of the thread loop.
 		double loopTotalTime = -999.0;
@@ -200,6 +202,12 @@ public class PipelineProcessB implements Runnable
 			if (mat == null) // threads start at different times so skip problems expected at the beginning
 			{
 				System.out.println(pId + " Skipping null mat");
+				continue;
+			}
+			
+			if (mat.empty()) // threads start at different times so skip problems expected at the beginning
+			{
+				System.out.println(pId + " Skipping empty mat");
 				continue;
 			}
 
@@ -293,7 +301,7 @@ public class PipelineProcessB implements Runnable
 		// Free the mat memory.
 		mat.release();
 
-			System.out.println(pId + " Camera Frame Grab Interrupted and Ended Thread");
+		// 	System.out.println(pId + " Camera Frame Grab Interrupted and Ended Thread");
 	}
 
 	/**

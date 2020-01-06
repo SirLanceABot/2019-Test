@@ -21,7 +21,7 @@ public class CameraProcessE implements Runnable
 	private String cameraName = "Elevator Camera";
 	private int cameraWidth = 320;
 	private int cameraHeight = 240;
-	private PipelineProcessE pipelineProcessE = new PipelineProcessE(this);
+	private PipelineProcessE pipelineProcessE;
 	private Thread pipeline;
 
 	// This object is used to capture frames from the camera.
@@ -91,6 +91,9 @@ public class CameraProcessE implements Runnable
 
 	public void run()
 	{
+		// first time through loop switch
+		boolean firstTime = true;
+
 		// This variable will be used to time each iteration of the thread loop.
 		double loopTotalTime = -999.0;
 
@@ -101,7 +104,6 @@ public class CameraProcessE implements Runnable
 
 		pipelineProcessE = new PipelineProcessE(this);
 		pipeline = new Thread(pipelineProcessE, "4237Epipeline");
-		pipeline.start();
 
         this.setDebuggingEnabled(Main.debug);
 
@@ -120,6 +122,19 @@ public class CameraProcessE implements Runnable
 			{
 				System.out.println(pId + " grabFrame error " + inputStream.getError());
 				cameraFrameTemp.setTo(new Scalar(100, 100, 100));
+			}
+			else
+			{ // good frame grab so see if pipeline should be started
+				if (firstTime)
+				{
+					try {
+						Thread.sleep(5000);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+					pipeline.start();
+					firstTime = false;
+				}
 			}
 
 			this.cameraFrame.setImage(cameraFrameTemp);

@@ -21,7 +21,7 @@ public class CameraProcessB implements Runnable
 	private String cameraName = "Bumper Camera";
 	private int cameraWidth = 160;
 	private int cameraHeight = 120;
-	private PipelineProcessB pipelineProcessB = new PipelineProcessB(this);
+	private PipelineProcessB pipelineProcessB;
 	private Thread pipeline;
 
 	// This object is used to capture frames from the camera.
@@ -91,6 +91,9 @@ public class CameraProcessB implements Runnable
 
 	public void run()
 	{
+		// first time through loop switch
+		boolean firstTime = true;
+
 		// This variable will be used to time each iteration of the thread loop.
 		double loopTotalTime = -999.0;
 
@@ -101,7 +104,6 @@ public class CameraProcessB implements Runnable
 
 		pipelineProcessB = new PipelineProcessB(this);
 		pipeline = new Thread(pipelineProcessB, "4237Bpipeline");
-		pipeline.start();
 
         this.setDebuggingEnabled(Main.debug);
 
@@ -120,6 +122,19 @@ public class CameraProcessB implements Runnable
 			{
 				System.out.println(pId + " grabFrame error " + inputStream.getError());
 				cameraFrameTemp.setTo(new Scalar(100, 100, 100));
+			}
+			else
+			{ // good frame grab so see if pipeline should be started
+				if (firstTime)
+				{
+					try {
+						Thread.sleep(5000);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+					pipeline.start();
+					firstTime = false;
+				}
 			}
 
 			this.cameraFrame.setImage(cameraFrameTemp);

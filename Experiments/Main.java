@@ -1,4 +1,7 @@
 /*
+To get rid of "errors" in the VS Code source presentation, change the .classpath to see the libraries
+
+
 Note there are some settable parameters located at the SKULL in the right wide scroller.
 
 A couple of changes to the FRCVision standard example project:
@@ -33,6 +36,12 @@ You should then have a 2.2.4 folder and a 2.8.5 folder under gson
 
 ====
 
+RaspBerry Pi setup:
+RaspBerry Pi setup:
+RaspBerry Pi setup:
+RaspBerry Pi setup:
+RaspBerry Pi setup:
+RaspBerry Pi setup:
 RaspBerry Pi setup:
 
 Download frcvision image (from some WPI Github repository)
@@ -146,6 +155,12 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
  */
 
 public final class Main {
+{
+    try {
+      Thread.sleep(10000);
+    } catch (InterruptedException ex) {
+    }
+} 
     private static final String pId = new String("[Main]");
 
     private static String output(InputStream inputStream) throws IOException
@@ -240,7 +255,7 @@ public final class Main {
 
 // Settable parameters for some outputs listed below
 
-    static String version = "rkt  11/3/2019";
+    static String version = "rkt  1/6/2020";
     static boolean runTestUDPreceiver = false;
     static String UDPreceiverName = "rkt-laptop.local";
     //static String UDPreceiverName = "0.0.0.0";
@@ -481,6 +496,14 @@ public final class Main {
         Main.obj.tabLock = new Object();
         Main.obj.tapeDistance = new AtomicInteger();
 
+        // // sleep needed on RPi 4 before datagram address resolution and also RPi 3 before mount
+        // // and for some other unknown reason after a power on boot up of the RPi 4
+        // try {
+        //     Thread.sleep(5000);
+        // } catch (InterruptedException e) {
+        //     e.printStackTrace();
+        // }
+
         sendMessage = new UdpSend(5800, UDPreceiverName);
         
         if(runTestUDPreceiver)
@@ -509,14 +532,14 @@ public final class Main {
         }
  
         // see if USB Flash Drive mounted and if so, log the images
-        try
-        {
-            System.out.println(pId + " Sleeping 3 seconds so auto mount will be done by now, we are hopeful.");
-            Thread.sleep(3000);
-        } catch (InterruptedException exc)
-        {
-            System.out.println(pId + " Sleep 3 seconds was interrupted");
-        }
+        // try
+        // {
+        //     System.out.println(pId + " Sleeping 3 seconds so auto mount will be done by now, we are hopeful.");
+        //     Thread.sleep(3000);// 3000
+        // } catch (InterruptedException exc)
+        // {
+        //     System.out.println(pId + " Sleep 3 seconds was interrupted");
+        // }
 
         try
         {

@@ -134,6 +134,8 @@ public class PipelineProcessE implements Runnable
 	 */
 	public void run()
 	{
+		System.out.println(pId + " Starting run");
+ 
         this.setDebuggingEnabled(Main.debug);
 
 		// This variable will be used to time each iteration of the thread loop.
@@ -202,7 +204,13 @@ public class PipelineProcessE implements Runnable
 				System.out.println(pId + " Skipping null mat");
 				continue;
 			}
-
+			
+			if (mat.empty()) // threads start at different times so skip problems expected at the beginning
+			{
+				System.out.println(pId + " Skipping empty mat");
+				continue;
+			}
+			
 			// Scaling if needed to reduce ethernet load might go here
 			// input mat must not be output mat
 			// Imgproc.resize(mat, differentmat, new Size(), 0.8, 0.8, Imgproc.INTER_AREA);
