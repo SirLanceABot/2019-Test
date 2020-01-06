@@ -1,3 +1,5 @@
+Image processing program for the Raspberry Pi - FRCVISION RPi image 2020 or 2019 running on RPi 3 or RPi 4.
+
 Source can be edited on Visual Studio Code and the "background" Java compile initiated by a VS Code command (included herein).
 
 Also requires "jar" libraries:
