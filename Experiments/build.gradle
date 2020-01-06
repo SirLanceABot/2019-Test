@@ -1,0 +1,50 @@
+plugins {
+    id 'java'
+    id 'application'
+    id 'com.github.johnrengelman.shadow' version '4.0.3' apply false
+}
+
+mainClassName = 'Main'
+
+apply plugin: 'com.github.johnrengelman.shadow'
+
+repositories {
+    mavenCentral() // must have this and Internet or mavenLocal with the files for shadow at least once
+    //maven { url 'C:/Users/Public/frc2019/maven/' } // define more mavenLocal - sufficient for gson w/o the pom file
+    //mavenLocal() // must have this with the files or mavenCentral with Internet for shadow at least once
+    flatDir {
+        dirs '/usr/local/frc/java', '.' // all paths will be prefixed with the project folder
+        // put the gson-2.8.5.jar in the project root folder or gson.jar
+    }
+}
+
+dependencies {
+    //compile 'com.google.code.gson:gson:2.8.5' // if a real mavenLocal repository, hide the pom file because the parent isn't available
+    compile name: 'gson-2.8.5'
+    compile name: 'wpiutil'
+    compile name: 'ntcore'
+    compile name: 'cscore'
+    compile name: 'cameraserver'
+    //compile name: 'opencv-344'
+    compile name: 'opencv-347'
+    compile name: 'wpilibj'
+    compile name: 'wpiHal'
+}
+
+wrapper {
+    gradleVersion = '5.0'
+}
+
+/*
+> Could not find com.google.code.gson:gson:2.8.5.
+     Searched in the following locations:
+       - file:/C:/Users/RKT/.m2/repository/com/google/code/gson/gson/2.8.5/gson-2.8.5.pom
+       - file:/C:/Users/RKT/.m2/repository/com/google/code/gson/gson/2.8.5/gson-2.8.5.jar
+       - file:/C:/Users/RKT/frc/FRC2019/Code/java-multiCameraServerRobot-WhiteTapeRetroTape/usr/local/frc/java/gson-2.8.5.jar
+       - file:/C:/Users/RKT/frc/FRC2019/Code/java-multiCameraServerRobot-WhiteTapeRetroTape/usr/local/frc/java/gson.jar
+       - file:/C:/Users/RKT/frc/FRC2019/Code/java-multiCameraServerRobot-WhiteTapeRetroTape/gson-2.8.5.jar
+       - file:/C:/Users/RKT/frc/FRC2019/Code/java-multiCameraServerRobot-WhiteTapeRetroTape/gson.jar
+Gradle looks into ‘~/.m2/settings.xml’ for information where the localMaven() repository is located.
+ If no information is found, it assumes ‘~/.m2/repository’.
+ say for example ‘maven { url ‘c:/Java/mvn-repo’ }’.
+*/
