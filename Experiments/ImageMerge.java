@@ -114,16 +114,24 @@ public class ImageMerge implements Runnable
                     Imgproc.resize(insert, insertSmall, new Size(), 0.6, 0.6, Imgproc.INTER_AREA);
 
                     // locate the small insert on the overlay
-                    // This assumes B is smaller than E.  If not, then opencv error in log from catch
+                    // This assumes B image is smaller than E image.
+                    // If not, then opencv error in log from catch
                     int rowStart = ImageOutput.rows() - insertSmall.rows(); // for top/down put at bottom
                     int rowEnd = rowStart + insertSmall.rows();
                     int colStart = (ImageOutput.cols() - insertSmall.cols()) / 2; // for left/right align centers of the
                                                                                   // two images
                     int colEnd = colStart + insertSmall.cols();
 
-                    subMat = ImageOverlay.submat(rowStart, rowEnd, colStart, colEnd); // define the insert area on the
-                                                                                      // main image
-
+                    try{
+                    // define the insert area on the main image
+                    // This assumes B image is smaller than E image.
+                    // If not, then opencv error in log from catch
+                    subMat = ImageOverlay.submat(rowStart, rowEnd, colStart, colEnd);}
+                    catch (Exception e)
+                    {
+                       System.out.println(pId + " B image not smaller than E image " + e);
+                       e.printStackTrace();
+                    }
                     insertSmall.copyTo(subMat); // copy the insert to the overlay's insert area
                     double alpha = 0.85f;
                     double beta = 0.25f;
@@ -141,6 +149,7 @@ public class ImageMerge implements Runnable
             } catch (Exception e)
             {
                 System.out.println(pId + " error " + e);
+                e.printStackTrace();
             }
         }
     }
