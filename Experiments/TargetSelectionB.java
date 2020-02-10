@@ -44,8 +44,10 @@ attempt to find 2 distinct sections of one contour to separate
             thus find the edge of the tape that isn't touching the edge of the image
             can't just check the bottom point - it might be (it's likely) only pixel wide there if it is touching a side
             can use bottom point even if only pixel there but can't determine which side it goes up.  Need to know left or right
-	    
-Added example HoughLines and HoughLinesP.
+
+More example OpenCV that has nothing to do with the find white tape
+	Added example HoughLines and HoughLinesP.
+	Added example HoughCircles
 */
 import java.util.ArrayList;
 import java.util.List;
@@ -265,6 +267,12 @@ public class TargetSelectionB
 	{
 	// run HoughLines and HoughLinesP - output is on the source mat
 	    findLines.findLines(mat);
+	}
+	    
+	if(false)
+	{
+	// run HoughCircles - probably would work better if mat first went through Thresholding
+	    detectPowerCells(mat);  // Power Cells are balls thus the HoughCircles
 	}
 
         if(false)
@@ -945,6 +953,77 @@ need to figure out squat shape
 
        // histImage.copyTo(mat);
     }
+	
+public void detectPowerCells(Mat input) 
+    {
+        desaturate(input, input);
+        Mat circles = new Mat();
+        Imgproc.blur(input, input, new Size(7, 7), new Point(2, 2));
+        //Imgproc.HoughCircles(input, circles, Imgproc.CV_HOUGH_GRADIENT, 2, 100, 100, 90, 0, 1000);
+        Imgproc.HoughCircles(input, circles, Imgproc.CV_HOUGH_GRADIENT, 1, input.rows()/8, 50, 30, 30, 100);
+        
+        //System.out.println(String.valueOf("size: " + circles.cols()) + ", " + String.valueOf(circles.rows()));
+        //System.out.println("size: " + circles.cols() + ", " + circles.rows());
+
+        if (circles.cols() > 0) 
+        {
+			// debug output Print all the contours
+
+			//System.out.println("Contour Index = " + contourIndex);
+			//System.out.println(contour.dump()); // OpenCV Mat dump one line string of numbers
+			// or more control over formating with your own array to manipualte
+			//System.out.print("[Vision] " + aContour.size() + " points in contour\n[Vision]"); // a contour is a bunch of points
+			// convert MatofPoint to an array of those Points and iterate (could do list of Points but no need for this)
+			//for(Point aPoint : aContour.toArray())System.out.print(" " + aPoint); // print each point
+			//System.out.println(circles.dump());
+			
+            for (int x=0; x < Math.min(circles.cols(), 5); x++ ) 
+            {
+                double circleVec[] = circles.get(0, x);
+
+                if (circleVec == null) 
+                {
+                    break;
+                }
+
+                Point center = new Point((int) circleVec[0], (int) circleVec[1]);
+                int radius = (int) circleVec[2];
+                //System.out.println(" x, y, r " + (circleVec[0]) + " " + (circleVec[1]) + " " + (circleVec[2]));
+
+                Imgproc.circle(input, center, 3, new Scalar(255, 255, 255), 5);
+                Imgproc.circle(input, center, radius, new Scalar(255, 255, 255), 2);
+            }
+        }
+
+        Imgproc.putText(input, "HoughCircles", new Point(20, 20), Core.FONT_HERSHEY_SIMPLEX, 0.25, new Scalar(190, 190, 190), 1);
+
+        circles.release();
+        //input.release();
+        
+    }
+
+    /**
+	 * Converts a color image into shades of grey.
+	 * @param input The image on which to perform the desaturate.
+	 * @param output The image in which to store the output.
+	 */
+private void desaturate(Mat input, Mat output) {
+		switch (input.channels()) {
+			case 1:
+				// If the input is already one channel, it's already desaturated
+				input.copyTo(output);
+				break;
+			case 3:
+				Imgproc.cvtColor(input, output, Imgproc.COLOR_BGR2GRAY);
+				break;
+			case 4:
+				Imgproc.cvtColor(input, output, Imgproc.COLOR_BGRA2GRAY);
+				break;
+			default:
+				throw new IllegalArgumentException("Input to desaturate must have 1, 3, or 4 channels");
+		}
+	}	    
+
 }
 
 //  Hough Transform in OpenCV Lines Parameters
